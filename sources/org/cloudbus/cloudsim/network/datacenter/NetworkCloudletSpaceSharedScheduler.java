@@ -17,6 +17,7 @@ import java.util.Map;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletScheduler;
 import org.cloudbus.cloudsim.ResCloudlet;
+import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 
@@ -532,6 +533,11 @@ public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 		length += extraSize;
 		cloudlet.setCloudletLength(length);
 		return cloudlet.getCloudletLength() / capacity;
+	}
+
+	@Override
+	public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm) {
+		return 0;
 	}
 
 	/*

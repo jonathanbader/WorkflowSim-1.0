@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,6 +17,7 @@ package org.workflowsim;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.UtilizationModelFull;
@@ -35,11 +36,11 @@ import org.cloudbus.cloudsim.UtilizationModelFull;
 public class Task extends Cloudlet {
 
     /*
-     * The list of parent tasks. 
+     * The list of parent tasks.
      */
     private List<Task> parentList;
     /*
-     * The list of child tasks. 
+     * The list of child tasks.
      */
     private List<Task> childList;
     /*
@@ -47,24 +48,27 @@ public class Task extends Cloudlet {
      */
     private List<FileItem> fileList;
     /*
-     * The priority used for research. Not used in current version. 
+     * The priority used for research. Not used in current version.
      */
     private int priority;
     /*
-     * The depth of this task. Depth of a task is defined as the furthest path 
-     * from the root task to this task. It is set during the workflow parsing 
-     * stage. 
+     * The depth of this task. Depth of a task is defined as the furthest path
+     * from the root task to this task. It is set during the workflow parsing
+     * stage.
      */
     private int depth;
     /*
-     * The impact of a task. It is used in research. 
+     * The impact of a task. It is used in research.
      */
     private double impact;
 
     /*
-     * The type of a task. 
+     * The type of a task.
      */
     private String type;
+
+
+    private String workflow;
 
     /**
      * The finish time of a task (Because cloudlet does not allow WorkflowSim to
@@ -295,6 +299,14 @@ public class Task extends Cloudlet {
      */
     public double getTaskFinishTime() {
         return this.taskFinishTime;
+    }
+
+    public String getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(String workflow) {
+        this.workflow = workflow;
     }
 
     /**

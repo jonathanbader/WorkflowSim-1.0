@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,11 +16,11 @@
 package org.workflowsim.examples;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -35,6 +35,10 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Task;
 import org.workflowsim.WorkflowDatacenter;
@@ -53,19 +57,61 @@ import org.workflowsim.utils.Parameters.ClassType;
  * least. You may change other parameters as well.
  *
  * @author Weiwei Chen
- * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
+ * @since WorkflowSim Toolkit 1.0
  */
 public class WorkflowSimBasicExample1 {
 
+    // klappt, muss jetzt unten eingebunden werden
+    protected static List<CondorVM> createVMs(int userId, int vms, long seed) {
+        SAXBuilder builder = new SAXBuilder();
+
+        Document dom;
+        try {
+            dom = builder.build(new File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/machines/machines.xml"));
+            Element root = dom.getRootElement();
+            List<Element> availableVMs = root.getChildren().get(0).getChildren("host");
+
+            LinkedList<CondorVM> results = new LinkedList<>();
+            Random random = new Random(seed);
+            CondorVM[] vm = new CondorVM[vms];
+            for (int i = 0; i < vms; i++) {
+                int randomNumber = (int) Math.round(random.nextDouble() * (availableVMs.size()-1));
+                Element selectedVM = availableVMs.get(randomNumber);
+                double mips = 100; // 1000 entspricht actual Laufzeit * 10, 100 entspricht actual runtime * 100
+                int ram = selectedVM.getChildren("prop").get(0).getAttribute("value").getIntValue();
+                int pesNumber = selectedVM.getAttribute("core").getIntValue();
+
+                double ratio = 1.0;
+                vm[i] = new CondorVM(i, userId, mips, pesNumber, ram, 10000, 100000, "Xen", new CloudletSchedulerSpaceShared());
+                vm[i].setName(selectedVM.getAttribute("id").getValue()); // evtl. Fehler hier
+                results.add(vm[i]);
+            }
+            System.out.println(results.stream().map(v -> v.getName()).collect(Collectors.toList()));
+            return results;
+
+        } catch (JDOMException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     protected static List<CondorVM> createVM(int userId, int vms) {
+
+
+
         //Creates a container to store VMs. This list is passed to the broker later
         LinkedList<CondorVM> list = new LinkedList<>();
 
         //VM Parameters
-        long size = 10000; //image size (MB)
+        long size = 100000; //image size (MB)
         int ram = 512; //vm memory (MB)
-        int mips = 1000;
+        int mips = 4000;
         long bw = 1000;
         int pesNumber = 1; //number of cpus
         String vmm = "Xen"; //VMM name
@@ -81,23 +127,34 @@ public class WorkflowSimBasicExample1 {
     }
 
     ////////////////////////// STATIC METHODS ///////////////////////
+
     /**
      * Creates main() to run this example This example has only one datacenter
      * and one storage
      */
     public static void main(String[] args) {
+
+        // Fehler bei random Cluster
+        for(long i=2; i<3; i++) {
+            runSimulation(i, Parameters.SchedulingAlgorithm.MINMIN);
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHI);
+        }
+
+    }
+
+    private static void runSimulation(Long seed, Parameters.SchedulingAlgorithm schedulingAlgorithm ) {
         try {
-            // First step: Initialize the WorkflowSim package. 
+            // First step: Initialize the WorkflowSim package.
             /**
              * However, the exact number of vms may not necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
-            int vmNum = 20;//number of vms;
+            int vmNum = 100;//number of vms;
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/Users/weiweich/NetBeansProjects/WorkflowSim-1.0/config/dax/Montage_100.xml";
+            String daxPath = "/home/joba/IdeaProjects/WorkflowSim-1.0/config/dax/methylseq.xml";
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -109,7 +166,7 @@ public class WorkflowSimBasicExample1 {
              * algorithm should be INVALID such that the planner would not
              * override the result of the scheduler
              */
-            Parameters.SchedulingAlgorithm sch_method = Parameters.SchedulingAlgorithm.MINMIN;
+            Parameters.SchedulingAlgorithm sch_method = schedulingAlgorithm;
             Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
             ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
@@ -154,7 +211,7 @@ public class WorkflowSimBasicExample1 {
              * Create a list of VMs.The userId of a vm is basically the id of
              * the scheduler that controls this vm.
              */
-            List<CondorVM> vmlist0 = createVM(wfEngine.getSchedulerId(0), Parameters.getVmNum());
+            List<CondorVM> vmlist0 = createVMs(wfEngine.getSchedulerId(0), Parameters.getVmNum(), seed);
 
             /**
              * Submits this list of vms to this WorkflowEngine.
@@ -186,16 +243,19 @@ public class WorkflowSimBasicExample1 {
         //    a Machine.
         for (int i = 1; i <= 20; i++) {
             List<Pe> peList1 = new ArrayList<>();
-            int mips = 2000;
+            int mips = 4000;
             // 3. Create PEs and add these into the list.
             //for a quad-core machine, a list of 4 PEs is required:
-            peList1.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
-            peList1.add(new Pe(1, new PeProvisionerSimple(mips)));
+
+            for (int j = 0; j < 64; j++) {
+                peList1.add(new Pe(j, new PeProvisionerSimple(mips)));
+            }
+
 
             int hostId = 0;
-            int ram = 2048; //host memory (MB)
-            long storage = 1000000; //host storage
-            int bw = 10000;
+            int ram = 256000; //host memory (MB)
+            long storage = 10000000; //host storage
+            int bw = 100000;
             hostList.add(
                     new Host(
                             hostId,
@@ -216,10 +276,10 @@ public class WorkflowSimBasicExample1 {
         String vmm = "Xen";
         double time_zone = 10.0;         // time zone this resource located
         double cost = 3.0;              // the cost of using processing in this resource
-        double costPerMem = 0.05;		// the cost of using memory in this resource
-        double costPerStorage = 0.1;	// the cost of using storage in this resource
-        double costPerBw = 0.1;			// the cost of using bw in this resource
-        LinkedList<Storage> storageList = new LinkedList<>();	//we are not adding SAN devices by now
+        double costPerMem = 0.05;        // the cost of using memory in this resource
+        double costPerStorage = 0.1;    // the cost of using storage in this resource
+        double costPerBw = 0.1;            // the cost of using bw in this resource
+        LinkedList<Storage> storageList = new LinkedList<>();    //we are not adding SAN devices by now
         WorkflowDatacenter datacenter = null;
 
         DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
@@ -267,11 +327,19 @@ public class WorkflowSimBasicExample1 {
             Log.print(indent);
 
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
-                Log.print("SUCCESS");
-                Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                        + indent + indent + indent + dft.format(job.getActualCPUTime())
-                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+
+                if(job.getTaskList().size() !=0) {
+                    Log.printLine(job.getTaskList().get(0).getType() + indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
+                            + indent + indent + indent + dft.format(job.getActualCPUTime())
+                            + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
+                            + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                } else {
+                    Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
+                            + indent + indent + indent + dft.format(job.getActualCPUTime())
+                            + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
+                            + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
+                }
+
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
                 Log.print("FAILED");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()

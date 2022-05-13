@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.workflowsim.FileItem;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
@@ -166,12 +167,13 @@ public class BasicClustering implements ClusteringInterface {
             int userId = 0;
             int priority = 0;
             int depth = 0;
+            int numberPEs = 0;
             /// a bug of cloudsim makes it final of input file size and output file size
             Job job = new Job(idIndex, length/*, inputFileSize, outputFileSize*/);
             job.setClassType(ClassType.COMPUTE.value);
             for (Task task : taskList) {
                 length += task.getCloudletLength();
-
+                numberPEs += task.getNumberOfPes();
                 userId = task.getUserId();
                 priority = task.getPriority();
                 depth = task.getDepth();
@@ -204,6 +206,7 @@ public class BasicClustering implements ClusteringInterface {
             job.setUserId(userId);
             job.setDepth(depth);
             job.setPriority(priority);
+            job.setNumberOfPes(numberPEs);
 
             idIndex++;
             getJobList().add(job);
@@ -215,7 +218,7 @@ public class BasicClustering implements ClusteringInterface {
 
     /**
      * For a clustered tasks, we should add clustering delay (by default it is
- zero)
+     zero)
      */
     public void addClustDelay() {
 

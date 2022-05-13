@@ -148,6 +148,8 @@ public final class WorkflowParser {
                         long length = 0;
                         String nodeName = node.getAttributeValue("id");
                         String nodeType = node.getAttributeValue("name");
+                        String workflow = node.getAttributeValue("namespace");
+                        Integer numcores = Integer.parseInt(node.getAttributeValue("numcores"));
                         /**
                          * capture runtime. If not exist, by default the runtime
                          * is 0.1. Otherwise CloudSim would ignore this task.
@@ -156,7 +158,7 @@ public final class WorkflowParser {
                         double runtime;
                         if (node.getAttributeValue("runtime") != null) {
                             String nodeTime = node.getAttributeValue("runtime");
-                            runtime = 1000 * Double.parseDouble(nodeTime);
+                            runtime = 10000 * Double.parseDouble(nodeTime);
                             if (runtime < 100) {
                                 runtime = 100;
                             }
@@ -249,14 +251,15 @@ public final class WorkflowParser {
                             this.jobIdStartsFrom++;
                         }
                         task.setType(nodeType);
+                        task.setWorkflow(workflow);
                         task.setUserId(userId);
+                        task.setNumberOfPes(numcores);
                         mName2Task.put(nodeName, task);
                         for (FileItem file : mFileList) {
                             task.addRequiredFile(file.getName());
                         }
                         task.setFileList(mFileList);
                         this.getTaskList().add(task);
-
                         /**
                          * Add dependencies info.
                          */

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.workflowsim.CondorVM;
+import org.workflowsim.Job;
 import org.workflowsim.WorkflowSimTags;
 
 /**
@@ -47,7 +48,7 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             int minIndex = 0;
             Cloudlet minCloudlet = null;
             for (int j = 0; j < size; j++) {
-                Cloudlet cloudlet = (Cloudlet) getCloudletList().get(j);
+                Job cloudlet = (Job) getCloudletList().get(j);
                 if (!hasChecked.get(j)) {
                     minCloudlet = cloudlet;
                     minIndex = j;

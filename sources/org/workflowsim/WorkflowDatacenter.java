@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,41 +15,37 @@
  */
 package org.workflowsim;
 
-import java.util.Iterator;
-import java.util.List;
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletScheduler;
-import org.cloudbus.cloudsim.Consts;
-import org.cloudbus.cloudsim.Datacenter;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicy;
+import com.jayway.jsonpath.JsonPath;
+import org.cloudbus.cloudsim.*;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
-import org.workflowsim.utils.ReplicaCatalog;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.ClassType;
 import org.workflowsim.utils.Parameters.FileType;
+import org.workflowsim.utils.ReplicaCatalog;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * WorkflowDatacenter extends Datacenter so as we can use CondorVM and other
  * components
  *
  * @author Weiwei Chen
- * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
+ * @since WorkflowSim Toolkit 1.0
  */
 public class WorkflowDatacenter extends Datacenter {
 
     public WorkflowDatacenter(String name,
-            DatacenterCharacteristics characteristics,
-            VmAllocationPolicy vmAllocationPolicy,
-            List<Storage> storageList,
-            double schedulingInterval) throws Exception {
+                              DatacenterCharacteristics characteristics,
+                              VmAllocationPolicy vmAllocationPolicy,
+                              List<Storage> storageList,
+                              double schedulingInterval) throws Exception {
         super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
     }
 
@@ -57,7 +53,7 @@ public class WorkflowDatacenter extends Datacenter {
      * Processes a Cloudlet submission. The cloudlet is actually a job which can
      * be cast to org.workflowsim.Job
      *
-     * @param ev a SimEvent object
+     * @param ev  a SimEvent object
      * @param ack an acknowledgement
      * @pre ev != null
      * @post $none
@@ -134,7 +130,8 @@ public class WorkflowDatacenter extends Datacenter {
             }
 
             CloudletScheduler scheduler = vm.getCloudletScheduler();
-            double estimatedFinishTime = scheduler.cloudletSubmit(job, fileTransferTime);
+            //double estimatedFinishTime = scheduler.cloudletSubmit(job, fileTransferTime);
+            double estimatedFinishTime = scheduler.cloudletSubmitAndReadReshi(job, fileTransferTime, vm);
             updateTaskExecTime(job, vm);
 
             // if this cloudlet is in the exec queue
@@ -154,6 +151,7 @@ public class WorkflowDatacenter extends Datacenter {
                 sendNow(job.getUserId(), tag, data);
             }
         } catch (ClassCastException c) {
+            c.printStackTrace();
             Log.printLine(getName() + ".processCloudletSubmit(): " + "ClassCastException error.");
         } catch (Exception e) {
             Log.printLine(getName() + ".processCloudletSubmit(): " + "Exception error.");
@@ -172,7 +170,8 @@ public class WorkflowDatacenter extends Datacenter {
         double start_time = job.getExecStartTime();
         for (Task task : job.getTaskList()) {
             task.setExecStartTime(start_time);
-            double task_runtime = task.getCloudletLength() / vm.getMips();
+            double task_runtime = 0;
+
             start_time += task_runtime;
             //Because CloudSim would not let us update end time here
             task.setTaskFinishTime(start_time);
@@ -258,7 +257,7 @@ public class WorkflowDatacenter extends Datacenter {
                         Vm vm = host.getVm(vmId, userId);
 
                         boolean requiredFileStagein = true;
-                        for (Iterator it = siteList.iterator(); it.hasNext();) {
+                        for (Iterator it = siteList.iterator(); it.hasNext(); ) {
                             //site is where one replica of this data is located at
                             String site = (String) it.next();
                             if (site.equals(this.getName())) {

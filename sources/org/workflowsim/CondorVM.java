@@ -54,6 +54,8 @@ public class CondorVM extends Vm {
      */
     private double cost = 0.0;
 
+
+
     /**
      * Creates a new CondorVM object.
      *
@@ -195,4 +197,6 @@ public class CondorVM extends Vm {
     public final int getState() {
         return this.state;
     }
+
+
 }

@@ -25,14 +25,7 @@ import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEvent;
 import org.cloudbus.cloudsim.lists.VmList;
 import org.workflowsim.failure.FailureGenerator;
-import org.workflowsim.scheduling.DataAwareSchedulingAlgorithm;
-import org.workflowsim.scheduling.BaseSchedulingAlgorithm;
-import org.workflowsim.scheduling.FCFSSchedulingAlgorithm;
-import org.workflowsim.scheduling.MCTSchedulingAlgorithm;
-import org.workflowsim.scheduling.MaxMinSchedulingAlgorithm;
-import org.workflowsim.scheduling.MinMinSchedulingAlgorithm;
-import org.workflowsim.scheduling.RoundRobinSchedulingAlgorithm;
-import org.workflowsim.scheduling.StaticSchedulingAlgorithm;
+import org.workflowsim.scheduling.*;
 import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.Parameters.SchedulingAlgorithm;
 
@@ -144,6 +137,9 @@ public class WorkflowScheduler extends DatacenterBroker {
             //by default it is Static
             case FCFS:
                 algorithm = new FCFSSchedulingAlgorithm();
+                break;
+            case RESHI:
+                algorithm = new ReshiSchedulingAlgorithm();
                 break;
             case MINMIN:
                 algorithm = new MinMinSchedulingAlgorithm();

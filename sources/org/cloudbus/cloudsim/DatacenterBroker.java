@@ -377,7 +377,7 @@ public class DatacenterBroker extends SimEntity {
 	 */
 	protected void clearDatacenters() {
 		for (Vm vm : getVmsCreatedList()) {
-			Log.printLine(CloudSim.clock() + ": " + getName() + ": Destroying VM #" + vm.getId());
+			//Log.printLine(CloudSim.clock() + ": " + getName() + ": Destroying VM #" + vm.getId());
 			sendNow(getVmsToDatacentersMap().get(vm.getId()), CloudSimTags.VM_DESTROY, vm);
 		}
 

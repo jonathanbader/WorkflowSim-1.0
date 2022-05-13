@@ -91,6 +91,11 @@ public class Cloudlet {
 	/** The ToS for sending Cloudlet over the network. */
 	private int netToS;
 
+	/**
+	 * Name of a Task
+	 */
+	private String type;
+
 	// //////////////////////////////////////////
 	// Below are CONSTANTS attributes
 	/** The Cloudlet has been created and added to the CloudletList object. */

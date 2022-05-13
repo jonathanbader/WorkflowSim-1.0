@@ -61,6 +61,8 @@ public abstract class CloudletScheduler {
 	 */
 	public abstract double cloudletSubmit(Cloudlet gl, double fileTransferTime);
 
+	public abstract double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm);
+
 	/**
 	 * Receives an cloudlet to be executed in the VM managed by this scheduler.
 	 * 

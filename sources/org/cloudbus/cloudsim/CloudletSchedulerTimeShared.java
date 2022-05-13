@@ -7,10 +7,16 @@
 
 package org.cloudbus.cloudsim;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.jayway.jsonpath.JsonPath;
 import org.cloudbus.cloudsim.core.CloudSim;
+import org.workflowsim.Job;
+import org.workflowsim.Task;
 
 /**
  * CloudletSchedulerTimeShared implements a policy of scheduling performed by a virtual machine.
@@ -307,10 +313,71 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 
 		getCloudletExecList().add(rcl);
 
+
+
 		// use the current capacity to estimate the extra amount of
 		// time to file transferring. It must be added to the cloudlet length
 		double extraSize = getCapacity(getCurrentMipsShare()) * fileTransferTime;
 		long length = (long) (cloudlet.getCloudletLength() + extraSize);
+		cloudlet.setCloudletLength(length);
+
+		return cloudlet.getCloudletLength() / getCapacity(getCurrentMipsShare());
+	}
+
+	@Override
+	public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm) {
+		ResCloudlet rcl = new ResCloudlet(cloudlet);
+		rcl.setCloudletStatus(Cloudlet.INEXEC);
+		for (int i = 0; i < cloudlet.getNumberOfPes(); i++) {
+			rcl.setMachineAndPeId(0, i);
+		}
+
+		getCloudletExecList().add(rcl);
+
+		Job job = (Job) cloudlet;
+
+
+		if (job.getTaskList().size() == 0) {
+			return cloudletSubmit(cloudlet, fileTransferTime);
+		}
+		Task task = job.getTaskList().get(0);
+		double task_runtime = 0;
+
+		try {
+			java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+			List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
+
+			AtomicInteger runtimeSum = new AtomicInteger();
+			AtomicInteger count = new AtomicInteger();
+			arr.forEach(entry -> {
+
+				if (task.getType().contains(((String) entry.get("taskName"))) &&
+						vm.getName().equals((String) entry.get("instanceType")) &&
+						((String) entry.get("wfName")).contains(task.getWorkflow())) {
+					runtimeSum.addAndGet((Integer) entry.get("realtime"));
+					count.getAndIncrement();
+				}
+			});
+			if (count.get() != 0) {
+
+				task_runtime = runtimeSum.get() / count.get();
+				//task_runtime = task.getCloudletLength() / vm.getMips();
+				System.out.println("Sum: "+ runtimeSum.get() + " - Count: " + count.get());
+
+			} else {
+				task_runtime = task.getCloudletLength() / vm.getMips();
+				System.out.println("---");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+		// use the current capacity to estimate the extra amount of
+		// time to file transferring. It must be added to the cloudlet length
+		double extraSize = getCapacity(getCurrentMipsShare()) * fileTransferTime;
+		long length = (long) (task_runtime + extraSize);
 		cloudlet.setCloudletLength(length);
 
 		return cloudlet.getCloudletLength() / getCapacity(getCurrentMipsShare());
