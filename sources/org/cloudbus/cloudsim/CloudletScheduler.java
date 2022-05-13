@@ -8,6 +8,7 @@
 
 package org.cloudbus.cloudsim;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -61,7 +62,7 @@ public abstract class CloudletScheduler {
 	 */
 	public abstract double cloudletSubmit(Cloudlet gl, double fileTransferTime);
 
-	public abstract double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm);
+	public abstract double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm, List<LinkedHashMap<String, Object>> arr);
 
 	/**
 	 * Receives an cloudlet to be executed in the VM managed by this scheduler.

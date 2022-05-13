@@ -416,7 +416,7 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
         return cloudlet.getCloudletLength() / capacity;
     }
 
-    public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm) {
+    public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm, List<LinkedHashMap<String, Object>> arr) {
         // it can go to the exec list
         if ((currentCpus - usedPes) >= cloudlet.getNumberOfPes()) {
             ResCloudlet rcl = new ResCloudlet(cloudlet);
@@ -458,36 +458,32 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
         Task task = job.getTaskList().get(0);
         double task_runtime = 0;
 
-        try {
-            java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
-            List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
 
-            AtomicInteger runtimeSum = new AtomicInteger();
-            AtomicInteger count = new AtomicInteger();
-            arr.forEach(entry -> {
+        //java.io.File f = new java.io.File("/dev/shm/runtimes_pp.json");
+        //java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+        //List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
 
-                if (task.getType().contains(((String) entry.get("taskName"))) &&
-                        vm.getName().equals((String) entry.get("instanceType")) &&
-                        ((String) entry.get("wfName")).contains(task.getWorkflow())) {
-                    runtimeSum.addAndGet((Integer) entry.get("realtime"));
-                    count.getAndIncrement();
-                }
-            });
-            if (count.get() != 0) {
+        AtomicInteger runtimeSum = new AtomicInteger();
+        AtomicInteger count = new AtomicInteger();
+        arr.forEach(entry -> {
 
-                task_runtime = runtimeSum.get() / count.get();
-                //task_runtime = task.getCloudletLength() / vm.getMips();
-                System.out.println("Sum: "+ runtimeSum.get() + " - Count: " + count.get());
-
-            } else {
-                task_runtime = task.getCloudletLength() / vm.getMips();
-                System.out.println("---");
+            if (task.getType().contains(((String) entry.get("taskName"))) &&
+                    vm.getName().equals((String) entry.get("instanceType")) &&
+                    ((String) entry.get("wfName")).contains(task.getWorkflow())) {
+                runtimeSum.addAndGet((Integer) entry.get("realtime"));
+                count.getAndIncrement();
             }
+        });
+        if (count.get() != 0) {
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            task_runtime = runtimeSum.get() / count.get();
+            //task_runtime = task.getCloudletLength() / vm.getMips();
+            System.out.println("Sum: " + runtimeSum.get() + " - Count: " + count.get());
+
+        } else {
+            task_runtime = task.getCloudletLength() / vm.getMips();
+            System.out.println("---");
         }
-
 
 
         // use the current capacity to estimate the extra amount of

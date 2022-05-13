@@ -8,11 +8,7 @@
 
 package org.cloudbus.cloudsim.network.datacenter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletScheduler;
@@ -536,9 +532,10 @@ public class NetworkCloudletSpaceSharedScheduler extends CloudletScheduler {
 	}
 
 	@Override
-	public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm) {
+	public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm, List<LinkedHashMap<String, Object>> arr) {
 		return 0;
 	}
+
 
 	/*
 	 * (non-Javadoc)

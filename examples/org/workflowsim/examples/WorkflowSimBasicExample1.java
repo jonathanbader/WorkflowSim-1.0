@@ -76,7 +76,7 @@ public class WorkflowSimBasicExample1 {
             Random random = new Random(seed);
             CondorVM[] vm = new CondorVM[vms];
             for (int i = 0; i < vms; i++) {
-                int randomNumber = (int) Math.round(random.nextDouble() * (availableVMs.size()-1));
+                int randomNumber = (int) Math.round(random.nextDouble() * (availableVMs.size() - 1));
                 Element selectedVM = availableVMs.get(randomNumber);
                 double mips = 100; // 1000 entspricht actual Laufzeit * 10, 100 entspricht actual runtime * 100
                 int ram = selectedVM.getChildren("prop").get(0).getAttribute("value").getIntValue();
@@ -102,7 +102,6 @@ public class WorkflowSimBasicExample1 {
     }
 
     protected static List<CondorVM> createVM(int userId, int vms) {
-
 
 
         //Creates a container to store VMs. This list is passed to the broker later
@@ -135,14 +134,14 @@ public class WorkflowSimBasicExample1 {
     public static void main(String[] args) {
 
         // Fehler bei random Cluster
-        for(long i=2; i<3; i++) {
+        for (long i = 2; i < 3; i++) {
             runSimulation(i, Parameters.SchedulingAlgorithm.MINMIN);
             runSimulation(i, Parameters.SchedulingAlgorithm.RESHI);
         }
 
     }
 
-    private static void runSimulation(Long seed, Parameters.SchedulingAlgorithm schedulingAlgorithm ) {
+    private static void runSimulation(Long seed, Parameters.SchedulingAlgorithm schedulingAlgorithm) {
         try {
             // First step: Initialize the WorkflowSim package.
             /**
@@ -225,6 +224,7 @@ public class WorkflowSimBasicExample1 {
             CloudSim.startSimulation();
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
             CloudSim.stopSimulation();
+            System.out.print(schedulingAlgorithm + "");
             printJobList(outputList0);
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
@@ -309,6 +309,7 @@ public class WorkflowSimBasicExample1 {
      * @param list list of jobs
      */
     protected static void printJobList(List<Job> list) {
+        /**
         String indent = "    ";
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
@@ -328,7 +329,7 @@ public class WorkflowSimBasicExample1 {
 
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
 
-                if(job.getTaskList().size() !=0) {
+                if (job.getTaskList().size() != 0) {
                     Log.printLine(job.getTaskList().get(0).getType() + indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
                             + indent + indent + indent + dft.format(job.getActualCPUTime())
                             + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
@@ -348,5 +349,7 @@ public class WorkflowSimBasicExample1 {
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             }
         }
+         **/
+        System.out.println(" Runtime: " + list.get(list.size() - 1).getFinishTime());
     }
 }

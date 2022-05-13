@@ -41,12 +41,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WorkflowDatacenter extends Datacenter {
 
+
+    List<LinkedHashMap<String, Object>> arr;
+
     public WorkflowDatacenter(String name,
                               DatacenterCharacteristics characteristics,
                               VmAllocationPolicy vmAllocationPolicy,
                               List<Storage> storageList,
                               double schedulingInterval) throws Exception {
         super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
+
+        java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+        arr = JsonPath.read(f, "$");
+
     }
 
     /**
@@ -131,7 +138,7 @@ public class WorkflowDatacenter extends Datacenter {
 
             CloudletScheduler scheduler = vm.getCloudletScheduler();
             //double estimatedFinishTime = scheduler.cloudletSubmit(job, fileTransferTime);
-            double estimatedFinishTime = scheduler.cloudletSubmitAndReadReshi(job, fileTransferTime, vm);
+            double estimatedFinishTime = scheduler.cloudletSubmitAndReadReshi(job, fileTransferTime, vm, arr);
             updateTaskExecTime(job, vm);
 
             // if this cloudlet is in the exec queue
