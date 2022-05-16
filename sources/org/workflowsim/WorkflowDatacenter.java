@@ -51,8 +51,8 @@ public class WorkflowDatacenter extends Datacenter {
                               double schedulingInterval) throws Exception {
         super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
 
-        java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
-        arr = JsonPath.read(f, "$");
+        //java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+        //arr = JsonPath.read(f, "$");
 
     }
 
@@ -138,7 +138,7 @@ public class WorkflowDatacenter extends Datacenter {
 
             CloudletScheduler scheduler = vm.getCloudletScheduler();
             //double estimatedFinishTime = scheduler.cloudletSubmit(job, fileTransferTime);
-            double estimatedFinishTime = scheduler.cloudletSubmitAndReadReshi(job, fileTransferTime, vm, arr);
+            double estimatedFinishTime = scheduler.cloudletSubmitAndReadReshi(job, fileTransferTime, vm);
             updateTaskExecTime(job, vm);
 
             // if this cloudlet is in the exec queue

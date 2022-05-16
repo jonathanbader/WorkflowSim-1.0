@@ -96,6 +96,10 @@ public class Cloudlet {
 	 */
 	private String type;
 
+	private double noise;
+
+	private long cloudletLengthWithNoise;
+
 	// //////////////////////////////////////////
 	// Below are CONSTANTS attributes
 	/** The Cloudlet has been created and added to the CloudletList object. */
@@ -1468,4 +1472,11 @@ public class Cloudlet {
 		return getUtilizationModelBw().getUtilization(time);
 	}
 
+	public long getCloudletLengthWithNoise() {
+		return cloudletLengthWithNoise;
+	}
+
+	public void setCloudletLengthWithNoise(long cloudletLengthWithNoise) {
+		this.cloudletLengthWithNoise = cloudletLengthWithNoise;
+	}
 }

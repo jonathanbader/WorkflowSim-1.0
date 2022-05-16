@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,30 +15,51 @@
  */
 package org.workflowsim.scheduling;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.workflowsim.CondorVM;
 import org.workflowsim.Job;
+import org.workflowsim.Task;
 import org.workflowsim.WorkflowSimTags;
 
 /**
  * MinMin algorithm.
  *
  * @author Weiwei Chen
- * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
+ * @since WorkflowSim Toolkit 1.0
  */
 public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
+    List<LinkedHashMap<String, Object>> arr;
+
+    NormalDistribution normalDistribution = new NormalDistribution(1, 0.5);
+    Random random = new Random();
+
     public MinMinSchedulingAlgorithm() {
         super();
+        try {
+            java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+            arr = JsonPath.read(f, "$");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     private final List<Boolean> hasChecked = new ArrayList<>();
 
     @Override
     public void run() {
 
+        minmin();
+
+        /*
         int size = getCloudletList().size();
         hasChecked.clear();
         for (int t = 0; t < size; t++) {
@@ -95,6 +116,198 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             firstIdleVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
             minCloudlet.setVmId(firstIdleVm.getId());
             getScheduledList().add(minCloudlet);
+        }
+
+         */
+
+    }
+
+
+    public void runReshiBaseline() {
+
+        ArrayList<Integer> checked = new ArrayList<>();
+
+        List<Job> cloudlets = new ArrayList<>(getCloudletList());
+
+        List<CondorVM> vmList = getVmList();
+
+        int size = cloudlets.size();
+
+
+        if (getCloudletList().size() == 0) {
+            return;
+        }
+
+        for (int iii = 0; iii < size; iii++) {
+
+            Task minTask = null;
+
+            CondorVM minVm = null;
+
+            long minTime = Long.MAX_VALUE;
+
+            for (Job jobWrapper : cloudlets) {
+
+                if (checked.contains(jobWrapper.getCloudletId())) {
+                    continue;
+                }
+
+                List<CondorVM> freeVMs = new ArrayList<>();
+                for (int l = 0; l < vmList.size(); l++) {
+                    CondorVM vm = vmList.get(l);
+                    if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
+                        freeVMs.add(vm);
+                    }
+                }
+
+                if (freeVMs.size() == 0) {
+                    break;
+                }
+
+                if (jobWrapper.getTaskList().size() == 0) {
+                    minVm = vmList.get((int) Math.round(random.nextDouble() * (vmList.size() - 1)));
+                    minTask = jobWrapper;
+                    break;
+                }
+
+                Task task = jobWrapper.getTaskList().get(0);
+
+                try {
+
+                    for (CondorVM vm : vmList) {
+
+                        AtomicInteger runtimeSum = new AtomicInteger();
+                        AtomicInteger count = new AtomicInteger();
+                        this.arr.forEach(entry -> {
+
+                            if (task.getType().contains(((String) entry.get("taskName"))) &&
+                                    vm.getName().equals((String) entry.get("instanceType")) &&
+                                    ((String) entry.get("wfName")).contains(task.getWorkflow())) {
+                                runtimeSum.addAndGet((Integer) entry.get("realtime"));
+                                count.getAndIncrement();
+                            }
+                        });
+
+                        long lengthWithNoise;
+
+                        if (random.nextDouble() > 0.5) {
+                            lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 + normalDistribution.sample() * 0.15));
+                        } else {
+                            lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 - normalDistribution.sample() * 0.15));
+                        }
+
+                        if (minTime > lengthWithNoise) {
+                            minTask = task;
+                            minVm = vm;
+                            minTime = lengthWithNoise;
+                            System.out.println("Set task " + task.getType() + "(" + minTask.getCloudletId() + ") with runtime " + minTime + " to min");
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            checked.add(minTask.getCloudletId());
+            Task finalMinTask = minTask;
+            Job minJob = cloudlets.stream().filter(c -> c.getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+            minJob.setVmId(minVm.getId());
+            minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+            getScheduledList().add(minJob);
+        }
+        System.out.println(getScheduledList());
+    }
+
+
+    public void minmin() {
+
+        ArrayList<Integer> checked = new ArrayList<>();
+
+        List<Job> cloudlets = new ArrayList<>(getCloudletList());
+
+        List<CondorVM> vmList = getVmList();
+
+        int size = cloudlets.size();
+
+        if (getCloudletList().size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < size; i++) {
+
+            Task minTask = null;
+
+            CondorVM minVm = null;
+
+            long minTime = Long.MAX_VALUE;
+
+            if (cloudlets.get(i).getTaskList().size() == 0) {
+                minVm = vmList.get((int) Math.round(random.nextDouble() * (vmList.size() - 1)));
+                minTask = cloudlets.get(i);
+                checked.add(minTask.getCloudletId());
+                Task finalMinTask = minTask;
+                Job minJob = cloudlets.stream().filter(c -> c.getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+                minJob.setVmId(minVm.getId());
+                minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+                getScheduledList().add(minJob);
+                return;
+            }
+
+            System.out.println("Filter:" + cloudlets.stream().filter(c -> checked.contains(c.getCloudletId())).collect(Collectors.toList()));
+            for (Job job : cloudlets.stream().filter(c -> !checked.contains(c.getTaskList().get(0).getCloudletId())).collect(Collectors.toList())) {
+                System.out.println("Has checked:" + checked);
+                Task task = job.getTaskList().get(0);
+                System.out.println("Job:" + task.getType() + "(" + job.getCloudletId() + ")");
+
+                List<CondorVM> freeVMs = new ArrayList<>();
+                for (int l = 0; l < vmList.size(); l++) {
+                    CondorVM vm = vmList.get(l);
+                    if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
+                        freeVMs.add(vm);
+                    }
+                }
+
+                for (CondorVM vm : freeVMs) {
+
+                    AtomicInteger runtimeSum = new AtomicInteger();
+                    AtomicInteger count = new AtomicInteger();
+                    this.arr.forEach(entry -> {
+
+                        if (task.getType().contains(((String) entry.get("taskName"))) &&
+                                vm.getName().equals((String) entry.get("instanceType")) &&
+                                ((String) entry.get("wfName")).contains(task.getWorkflow())) {
+                            runtimeSum.addAndGet((Integer) entry.get("realtime"));
+                            count.getAndIncrement();
+                        }
+                    });
+
+                    long lengthWithNoise;
+
+                    if (random.nextDouble() > 0.5 && count.get() != 0) {
+                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 + normalDistribution.sample() * 0.15));
+                    } else if (count.get() != 0){
+                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 - normalDistribution.sample() * 0.15));
+                    } else {
+                        lengthWithNoise = (long) (task.getCloudletLength() * (1 - normalDistribution.sample() * 0.15));
+                    }
+
+                    if (minTime > lengthWithNoise) {
+                        minTask = task;
+                        minVm = vm;
+                        minTime = lengthWithNoise;
+                    }
+
+                }
+            }
+            System.out.println("Assgined: " + minTask.getType() + "(" + minTask.getCloudletId() + ")");
+            checked.add(minTask.getCloudletId());
+            Task finalMinTask = minTask;
+            Job minJob = cloudlets.stream().filter(c -> c.getTaskList().get(0).getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+            minJob.setVmId(minVm.getId());
+            minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+            getScheduledList().add(minJob);
         }
     }
 }

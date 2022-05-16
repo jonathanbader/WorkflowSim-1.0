@@ -15,12 +15,17 @@
  */
 package org.workflowsim.examples;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.JsonPath;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
@@ -63,7 +68,7 @@ import org.workflowsim.utils.Parameters.ClassType;
 public class WorkflowSimBasicExample1 {
 
     // klappt, muss jetzt unten eingebunden werden
-    protected static List<CondorVM> createVMs(int userId, int vms, long seed) {
+    protected static List<CondorVM> createVMs(int userId, int vms, long seed, List<LinkedHashMap<String, Object>> arr) {
         SAXBuilder builder = new SAXBuilder();
 
         Document dom;
@@ -83,7 +88,7 @@ public class WorkflowSimBasicExample1 {
                 int pesNumber = selectedVM.getAttribute("core").getIntValue();
 
                 double ratio = 1.0;
-                vm[i] = new CondorVM(i, userId, mips, pesNumber, ram, 10000, 100000, "Xen", new CloudletSchedulerSpaceShared());
+                vm[i] = new CondorVM(i, userId, mips, pesNumber, ram, 10000, 100000, "Xen", new CloudletSchedulerSpaceShared(arr));
                 vm[i].setName(selectedVM.getAttribute("id").getValue()); // evtl. Fehler hier
                 results.add(vm[i]);
             }
@@ -131,17 +136,47 @@ public class WorkflowSimBasicExample1 {
      * Creates main() to run this example This example has only one datacenter
      * and one storage
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        // Fehler bei random Cluster
-        for (long i = 2; i < 3; i++) {
-            runSimulation(i, Parameters.SchedulingAlgorithm.MINMIN);
-            runSimulation(i, Parameters.SchedulingAlgorithm.RESHI);
+        // Hier die Args nutzen
+        // deployment einstellen
+        // Mehr VMs auf einem Host
+
+        int numberIterations = 100;
+        int clusterSize = 100;
+
+        if (args.length == 2) {
+            numberIterations = Integer.parseInt(args[0]);
+            clusterSize = Integer.parseInt(args[1]);
         }
+
+        java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+        List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
+
+        ExecutorService executorService = Executors.newFixedThreadPool(7);
+
+        BufferedWriter resultsWriter = new BufferedWriter(new FileWriter("results_" + numberIterations + "_" + clusterSize + ".csv"));
+        resultsWriter.write("NumberNodes,Seed,Scheduler,Runtime" + "\n");
+        Long millis_start = System.currentTimeMillis();
+        // Fehler bei random Cluster
+        for (long i = 0; i < numberIterations; i++) {
+
+
+            runSimulation(i, Parameters.SchedulingAlgorithm.STATIC, arr, resultsWriter, clusterSize);
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHI, arr, resultsWriter, clusterSize);
+            runSimulation(i, Parameters.SchedulingAlgorithm.MINMIN, arr, resultsWriter, clusterSize);
+            runSimulation(i, Parameters.SchedulingAlgorithm.MAXMIN, arr, resultsWriter, clusterSize);
+            runSimulation(i, Parameters.SchedulingAlgorithm.MCT, arr, resultsWriter, clusterSize);
+            runSimulation(i, Parameters.SchedulingAlgorithm.ROUNDROBIN, arr, resultsWriter, clusterSize);
+
+
+        }
+        System.out.println("Runtime in millis:" + (System.currentTimeMillis() - millis_start));
+        resultsWriter.close();
 
     }
 
-    private static void runSimulation(Long seed, Parameters.SchedulingAlgorithm schedulingAlgorithm) {
+    private static void runSimulation(Long seed, Parameters.SchedulingAlgorithm schedulingAlgorithm, List<LinkedHashMap<String, Object>> arr, BufferedWriter bufferedWriter, int totalNumberVms) {
         try {
             // First step: Initialize the WorkflowSim package.
             /**
@@ -149,7 +184,7 @@ public class WorkflowSimBasicExample1 {
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
-            int vmNum = 100;//number of vms;
+            int vmNum = totalNumberVms;//number of vms;
             /**
              * Should change this based on real physical path
              */
@@ -160,14 +195,22 @@ public class WorkflowSimBasicExample1 {
                 return;
             }
 
+            Parameters.SchedulingAlgorithm sch_method;
+            Parameters.PlanningAlgorithm pln_method;
+            ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
+
+            if (schedulingAlgorithm != Parameters.SchedulingAlgorithm.STATIC) {
+                sch_method = schedulingAlgorithm;
+                pln_method = Parameters.PlanningAlgorithm.INVALID;
+            } else {
+                sch_method = schedulingAlgorithm;
+                pln_method = Parameters.PlanningAlgorithm.HEFT;
+            }
             /**
              * Since we are using MINMIN scheduling algorithm, the planning
              * algorithm should be INVALID such that the planner would not
              * override the result of the scheduler
              */
-            Parameters.SchedulingAlgorithm sch_method = schedulingAlgorithm;
-            Parameters.PlanningAlgorithm pln_method = Parameters.PlanningAlgorithm.INVALID;
-            ReplicaCatalog.FileSystem file_system = ReplicaCatalog.FileSystem.SHARED;
 
             /**
              * No overheads
@@ -210,8 +253,8 @@ public class WorkflowSimBasicExample1 {
              * Create a list of VMs.The userId of a vm is basically the id of
              * the scheduler that controls this vm.
              */
-            List<CondorVM> vmlist0 = createVMs(wfEngine.getSchedulerId(0), Parameters.getVmNum(), seed);
-
+            List<CondorVM> vmlist0 = createVMs(wfEngine.getSchedulerId(0), Parameters.getVmNum(), seed, arr);
+            // TODO baselines anpassen
             /**
              * Submits this list of vms to this WorkflowEngine.
              */
@@ -225,7 +268,7 @@ public class WorkflowSimBasicExample1 {
             List<Job> outputList0 = wfEngine.getJobsReceivedList();
             CloudSim.stopSimulation();
             System.out.print(schedulingAlgorithm + "");
-            printJobList(outputList0);
+            printJobList(outputList0, schedulingAlgorithm, vmNum, seed, bufferedWriter, vmlist0);
         } catch (Exception e) {
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
@@ -308,8 +351,37 @@ public class WorkflowSimBasicExample1 {
      *
      * @param list list of jobs
      */
+    protected static void printJobList(List<Job> list, Parameters.SchedulingAlgorithm schedulingAlgorithm, int numberVM, Long seed, BufferedWriter bufferedWriter, List<CondorVM> vms) {
+
+        HashMap<String, Integer> map = new HashMap<>();
+
+        for (Job job : list) {
+            for (CondorVM vm : vms) {
+                if (job.getVmId() == vm.getId()) {
+                    if (map.containsKey(vm.getName())) {
+                        map.put(vm.getName(), map.get(vm.getName()) + 1);
+                    } else {
+                        map.put(vm.getName(), 1);
+                    }
+                }
+            }
+        }
+
+        try {
+            bufferedWriter.write(numberVM + "," + seed + "," + schedulingAlgorithm + "," + list.get(list.size() - 1).getFinishTime() + "," + map.toString().replace(",", ";") + "\n");
+            bufferedWriter.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(" Runtime: " + list.get(list.size() - 1).getFinishTime() + "\n");
+    }
+
+    /**
+     * Prints the job objects
+     *
+     * @param list list of jobs
+     */
     protected static void printJobList(List<Job> list) {
-        /**
         String indent = "    ";
         Log.printLine();
         Log.printLine("========== OUTPUT ==========");
@@ -328,19 +400,11 @@ public class WorkflowSimBasicExample1 {
             Log.print(indent);
 
             if (job.getCloudletStatus() == Cloudlet.SUCCESS) {
-
-                if (job.getTaskList().size() != 0) {
-                    Log.printLine(job.getTaskList().get(0).getType() + indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                            + indent + indent + indent + dft.format(job.getActualCPUTime())
-                            + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                            + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
-                } else {
-                    Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
-                            + indent + indent + indent + dft.format(job.getActualCPUTime())
-                            + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
-                            + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
-                }
-
+                Log.print("SUCCESS");
+                Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
+                        + indent + indent + indent + dft.format(job.getActualCPUTime())
+                        + indent + indent + dft.format(job.getExecStartTime()) + indent + indent + indent
+                        + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             } else if (job.getCloudletStatus() == Cloudlet.FAILED) {
                 Log.print("FAILED");
                 Log.printLine(indent + indent + job.getResourceId() + indent + indent + indent + job.getVmId()
@@ -349,7 +413,6 @@ public class WorkflowSimBasicExample1 {
                         + dft.format(job.getFinishTime()) + indent + indent + indent + job.getDepth());
             }
         }
-         **/
-        System.out.println(" Runtime: " + list.get(list.size() - 1).getFinishTime());
     }
+
 }

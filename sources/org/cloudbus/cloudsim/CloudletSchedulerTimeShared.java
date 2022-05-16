@@ -325,7 +325,7 @@ public class CloudletSchedulerTimeShared extends CloudletScheduler {
 	}
 
 	@Override
-	public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm, List<LinkedHashMap<String, Object>> arr) {
+	public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm) {
 		return 0;
 	}
 

@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,11 +15,12 @@
  */
 package org.workflowsim.planning;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
@@ -35,12 +36,16 @@ import org.workflowsim.utils.Parameters;
  */
 public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
+    List<LinkedHashMap<String, Object>> arr;
     private Map<Task, Map<CondorVM, Double>> computationCosts;
     private Map<Task, Map<Task, Double>> transferCosts;
     private Map<Task, Double> rank;
     private Map<CondorVM, List<Event>> schedules;
     private Map<Task, Double> earliestFinishTimes;
     private double averageBandwidth;
+
+    NormalDistribution normalDistribution = new NormalDistribution(1, 0.5);
+    Random random = new Random();
 
     private class Event {
 
@@ -75,6 +80,14 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         rank = new HashMap<>();
         earliestFinishTimes = new HashMap<>();
         schedules = new HashMap<>();
+
+
+        try {
+            java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+            arr = JsonPath.read(f, "$");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -127,8 +140,38 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                 if (vm.getNumberOfPes() < task.getNumberOfPes()) {
                     costsVm.put(vm, Double.MAX_VALUE);
                 } else {
+
+                    double task_runtime = 0;
+
+                    AtomicInteger runtimeSum = new AtomicInteger();
+                    AtomicInteger count = new AtomicInteger();
+                    arr.forEach(entry -> {
+
+                        if (task.getType().contains(((String) entry.get("taskName"))) &&
+                                vm.getName().equals((String) entry.get("instanceType")) &&
+                                ((String) entry.get("wfName")).contains(task.getWorkflow())) {
+                            runtimeSum.addAndGet((Integer) entry.get("realtime"));
+                            count.getAndIncrement();
+                        }
+                    });
+                    if (count.get() != 0) {
+
+                        task_runtime = runtimeSum.get() / count.get();
+                        //task_runtime = task.getCloudletLength() / vm.getMips();
+                    } else {
+                        task_runtime = task.getCloudletLength() / vm.getMips();
+                    }
+
+                    double lengthWithNoise;
+                    if (random.nextDouble() > 0.5) {
+                        lengthWithNoise = (task_runtime * (1 + normalDistribution.sample() * 0.15));
+                    } else {
+                        lengthWithNoise = (task_runtime * (1 - normalDistribution.sample() * 0.15));
+                    }
+
                     costsVm.put(vm,
-                            task.getCloudletTotalLength() / vm.getMips());
+                            lengthWithNoise);
+
                 }
             }
             computationCosts.put(task, costsVm);
@@ -303,7 +346,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      * @return The minimal finish time of the task in the vmn
      */
     private double findFinishTime(Task task, CondorVM vm, double readyTime,
-            boolean occupySlot) {
+                                  boolean occupySlot) {
         List<Event> sched = schedules.get(vm);
         double computationCost = computationCosts.get(task).get(vm);
         double start, finish;

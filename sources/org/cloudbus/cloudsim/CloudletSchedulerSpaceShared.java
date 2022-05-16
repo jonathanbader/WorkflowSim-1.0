@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.Job;
 import org.workflowsim.Task;
@@ -62,6 +64,9 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
      */
     protected int usedPes;
 
+
+    List<LinkedHashMap<String, Object>> taskList;
+
     /**
      * Creates a new CloudletSchedulerSpaceShared object. This method must be invoked before
      * starting the actual simulation.
@@ -77,6 +82,17 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
         cloudletFinishedList = new ArrayList<ResCloudlet>();
         usedPes = 0;
         currentCpus = 0;
+    }
+
+    public CloudletSchedulerSpaceShared(List<LinkedHashMap<String, Object>> arr) {
+        super();
+        cloudletWaitingList = new ArrayList<ResCloudlet>();
+        cloudletExecList = new ArrayList<ResCloudlet>();
+        cloudletPausedList = new ArrayList<ResCloudlet>();
+        cloudletFinishedList = new ArrayList<ResCloudlet>();
+        usedPes = 0;
+        currentCpus = 0;
+        this.taskList = arr;
     }
 
     /**
@@ -416,7 +432,7 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
         return cloudlet.getCloudletLength() / capacity;
     }
 
-    public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm, List<LinkedHashMap<String, Object>> arr) {
+    public double cloudletSubmitAndReadReshi(Cloudlet cloudlet, double fileTransferTime, Vm vm) {
         // it can go to the exec list
         if ((currentCpus - usedPes) >= cloudlet.getNumberOfPes()) {
             ResCloudlet rcl = new ResCloudlet(cloudlet);
@@ -458,14 +474,9 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
         Task task = job.getTaskList().get(0);
         double task_runtime = 0;
 
-
-        //java.io.File f = new java.io.File("/dev/shm/runtimes_pp.json");
-        //java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
-        //List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
-
         AtomicInteger runtimeSum = new AtomicInteger();
         AtomicInteger count = new AtomicInteger();
-        arr.forEach(entry -> {
+        this.taskList.forEach(entry -> {
 
             if (task.getType().contains(((String) entry.get("taskName"))) &&
                     vm.getName().equals((String) entry.get("instanceType")) &&
@@ -475,23 +486,20 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
             }
         });
         if (count.get() != 0) {
-
             task_runtime = runtimeSum.get() / count.get();
             //task_runtime = task.getCloudletLength() / vm.getMips();
-            System.out.println("Sum: " + runtimeSum.get() + " - Count: " + count.get());
 
         } else {
             task_runtime = task.getCloudletLength() / vm.getMips();
-            System.out.println("---");
         }
-
+        // Scheduler müssen den falschen Werte nehmen und dann hier den richtigen und nicht umgekehrt
 
         // use the current capacity to estimate the extra amount of
         // time to file transferring. It must be added to the cloudlet length
         double extraSize = capacity * fileTransferTime;
         double length = task_runtime;
         length += extraSize;
-        System.out.println("Runtime for Task " + task.getType() + ": " + length + " on " + vm.getName());
+        System.out.println("Runtime for Task " + task.getType() + " (" + task.getCloudletId() + "): " + length + " on " + vm.getName());
 
         cloudlet.setCloudletLength((long) length);
         return cloudlet.getCloudletLength() / capacity;

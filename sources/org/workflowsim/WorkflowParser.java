@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,11 +17,11 @@ package org.workflowsim;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.cloudbus.cloudsim.Log;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -35,9 +35,9 @@ import org.workflowsim.utils.ReplicaCatalog;
  * WorkflowParser parse a DAX into tasks so that WorkflowSim can manage them
  *
  * @author Weiwei Chen
- * @since WorkflowSim Toolkit 1.0
  * @date Aug 23, 2013
  * @date Nov 9, 2014
+ * @since WorkflowSim Toolkit 1.0
  */
 public final class WorkflowParser {
 
@@ -81,6 +81,7 @@ public final class WorkflowParser {
     protected void setTaskList(List<Task> taskList) {
         this.taskList = taskList;
     }
+
     /**
      * Map from task name to task.
      */
@@ -90,7 +91,7 @@ public final class WorkflowParser {
      * Initialize a WorkflowParser
      *
      * @param userId the user id. Currently we have just checked single user
-     * mode
+     *               mode
      */
     public WorkflowParser(int userId) {
         this.userId = userId;
@@ -118,7 +119,7 @@ public final class WorkflowParser {
     /**
      * Sets the depth of a task
      *
-     * @param task the task
+     * @param task  the task
      * @param depth the depth
      */
     private void setDepth(Task task, int depth) {
@@ -142,6 +143,10 @@ public final class WorkflowParser {
             Document dom = builder.build(new File(path));
             Element root = dom.getRootElement();
             List<Element> list = root.getChildren();
+
+            //NormalDistribution normalDistribution = new NormalDistribution(1, 0.5);
+            //Random random = new Random();
+
             for (Element node : list) {
                 switch (node.getName().toLowerCase()) {
                     case "job":
@@ -149,7 +154,10 @@ public final class WorkflowParser {
                         String nodeName = node.getAttributeValue("id");
                         String nodeType = node.getAttributeValue("name");
                         String workflow = node.getAttributeValue("namespace");
-                        Integer numcores = Integer.parseInt(node.getAttributeValue("numcores"));
+                        Integer numcores = 1;
+                        if (node.getAttributeValue("numcores") != null) {
+                            numcores = Integer.parseInt(node.getAttributeValue("numcores"));
+                        }
                         /**
                          * capture runtime. If not exist, by default the runtime
                          * is 0.1. Otherwise CloudSim would ignore this task.
@@ -167,6 +175,14 @@ public final class WorkflowParser {
                             Log.printLine("Cannot find runtime for " + nodeName + ",set it to be 0");
                         }   //multiple the scale, by default it is 1.0
                         length *= Parameters.getRuntimeScale();
+                        long lengthWithNoise;
+                    /**    if (random.nextDouble() > 0.5) {
+                            lengthWithNoise = (long) (length * (1 + normalDistribution.sample() * 0.15));
+                        } else {
+                            lengthWithNoise = (long) (length * (1 - normalDistribution.sample() * 0.15));
+                        }
+                     **/
+
                         List<Element> fileList = node.getChildren();
                         List<FileItem> mFileList = new ArrayList<>();
                         for (Element file : fileList) {
@@ -254,6 +270,7 @@ public final class WorkflowParser {
                         task.setWorkflow(workflow);
                         task.setUserId(userId);
                         task.setNumberOfPes(numcores);
+                       // task.setCloudletLengthWithNoise(lengthWithNoise);
                         mName2Task.put(nodeName, task);
                         for (FileItem file : mFileList) {
                             task.addRequiredFile(file.getName());
@@ -297,7 +314,7 @@ public final class WorkflowParser {
             /**
              * Add depth from top to bottom.
              */
-            for (Iterator it = roots.iterator(); it.hasNext();) {
+            for (Iterator it = roots.iterator(); it.hasNext(); ) {
                 Task task = (Task) it.next();
                 setDepth(task, 1);
             }
