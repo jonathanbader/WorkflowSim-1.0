@@ -63,6 +63,29 @@ import org.workflowsim.utils.Parameters.ClassType;
 public class WorkflowSimBasicExample1 {
 
     // klappt, muss jetzt unten eingebunden werden
+
+
+    private static List<String> getAllVMNames() {
+
+        SAXBuilder builder = new SAXBuilder();
+        Document dom;
+
+        try {
+            dom = builder.build(new File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/machines/machines.xml"));
+            Element root = dom.getRootElement();
+            List<Element> availableVMs = root.getChildren().get(0).getChildren("host");
+            List<String> list = availableVMs.stream().map(v -> v.getAttribute("id").getValue()).collect(Collectors.toList());
+            Collections.sort(list);
+            return list;
+        } catch (JDOMException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
     protected static List<CondorVM> createVMs(int userId, int vms, long seed, List<LinkedHashMap<String, Object>> arr) {
         SAXBuilder builder = new SAXBuilder();
 
@@ -167,7 +190,9 @@ public class WorkflowSimBasicExample1 {
         long randomSeed = System.currentTimeMillis();
 
         BufferedWriter resultsWriter = new BufferedWriter(new FileWriter("results_" + numberIterations + "_" + clusterSize + ".csv"));
-        resultsWriter.write("NumberNodes,Seed,Scheduler,Runtime" + "\n");
+
+
+        resultsWriter.write("NumberNodes,Seed,Scheduler,Runtime," + String.join(",", getAllVMNames()) + ",Nodes" + "\n");
         Long millis_start = System.currentTimeMillis();
         // Fehler bei random Cluster
         for (long i = 0; i < numberIterations; i++) {
@@ -209,7 +234,7 @@ public class WorkflowSimBasicExample1 {
         try {
             // First step: Initialize the WorkflowSim package.
             /**
-             * However, the exact number of vms may not necessarily be vmNum If
+             * However, the exact number of vms may nft necessarily be vmNum If
              * the data center or the host doesn't have sufficient resources the
              * exact vmNum would be smaller than that. Take care.
              */
@@ -217,7 +242,7 @@ public class WorkflowSimBasicExample1 {
             /**
              * Should change this based on real physical path
              */
-            String daxPath = "/home/joba/IdeaProjects/WorkflowSim-1.0/config/dax/methylseq.xml";
+            String daxPath = "/home/joba/IdeaProjects/WorkflowSim-1.0/config/dax/" + MetaGetter.getWorkflow() + ".xml";
             File daxFile = new File(daxPath);
             if (!daxFile.exists()) {
                 Log.printLine("Warning: Please replace daxPath with the physical path in your working environment!");
@@ -382,22 +407,24 @@ public class WorkflowSimBasicExample1 {
      */
     protected static void printJobList(List<Job> list, Parameters.SchedulingAlgorithm schedulingAlgorithm, int numberVM, Long seed, BufferedWriter bufferedWriter, List<CondorVM> vms) {
 
-        HashMap<String, Integer> map = new HashMap<>();
+        TreeMap<String, Integer> map = new TreeMap<>();
+
+        getAllVMNames().forEach(vm -> {
+            map.put(vm, 0);
+        });
 
         for (Job job : list) {
             for (CondorVM vm : vms) {
                 if (job.getVmId() == vm.getId()) {
-                    if (map.containsKey(vm.getName())) {
-                        map.put(vm.getName(), map.get(vm.getName()) + 1);
-                    } else {
-                        map.put(vm.getName(), 1);
-                    }
+                    map.put(vm.getName(), map.get(vm.getName()) + 1);
                 }
             }
         }
 
+        //String.join(",", map.values() + "");
+
         try {
-            bufferedWriter.write(numberVM + "," + seed + "," + schedulingAlgorithm + "," + list.get(list.size() - 1).getFinishTime() + "," + map.toString().replace(",", ";") + "\n");
+            bufferedWriter.write(numberVM + "," + seed + "," + schedulingAlgorithm + "," + list.get(list.size() - 1).getFinishTime() + "," + String.join(",", map.values() + "").replace("[", "").replace("]", "") + "," + map.toString().replace(",", ";") + "\n");
             bufferedWriter.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

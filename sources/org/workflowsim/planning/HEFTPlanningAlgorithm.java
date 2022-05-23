@@ -146,7 +146,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
                     AtomicInteger runtimeSum = new AtomicInteger();
                     AtomicInteger count = new AtomicInteger();
-                    arr.forEach(entry -> {
+                    arr.stream().filter(e -> ((String)e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
 
                         if (task.getType().contains(((String) entry.get("taskName"))) &&
                                 vm.getName().equals((String) entry.get("instanceType")) &&

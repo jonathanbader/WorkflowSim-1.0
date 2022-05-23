@@ -23,7 +23,9 @@ public class MetaGetter {
 
     private static double error = 0.15;
 
-    public static double getRandomFromNormalDist() {
+    private static String workflow = "methylseq";
+
+    private static double getRandomFromNormalDist() {
 
         BufferedReader bufferedReader = null;
         try {
@@ -54,7 +56,7 @@ public class MetaGetter {
         }
     }
 
-    public static double getRandomFromExponentialDist() {
+    private static double getRandomFromExponentialDist() {
 
         BufferedReader bufferedReader = null;
 
@@ -102,5 +104,10 @@ public class MetaGetter {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    public static String getWorkflow() {
+        return workflow;
     }
 }
