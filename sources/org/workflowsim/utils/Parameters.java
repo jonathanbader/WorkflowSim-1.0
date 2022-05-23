@@ -37,7 +37,7 @@ public class Parameters {
 
         MAXMIN, MINMIN, MCT, DATA, 
         STATIC, FCFS, ROUNDROBIN, INVALID,
-        RESHI
+        RESHIV1, RESHIV2, RESHIV3, RESHIFCFS,RESHIMAX
     }
     
     /**

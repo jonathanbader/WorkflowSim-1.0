@@ -25,6 +25,7 @@ import org.cloudbus.cloudsim.Consts;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
 import org.workflowsim.FileItem;
+import org.workflowsim.MetaGetter;
 import org.workflowsim.Task;
 import org.workflowsim.utils.Parameters;
 
@@ -154,19 +155,13 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                             count.getAndIncrement();
                         }
                     });
-                    if (count.get() != 0) {
 
-                        task_runtime = runtimeSum.get() / count.get();
-                        //task_runtime = task.getCloudletLength() / vm.getMips();
-                    } else {
-                        task_runtime = task.getCloudletLength() / vm.getMips();
-                    }
 
                     double lengthWithNoise;
-                    if (random.nextDouble() > 0.5) {
-                        lengthWithNoise = (task_runtime * (1 + normalDistribution.sample() * 0.15));
+                    if (count.get() != 0) {
+                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * MetaGetter.getRandomFactor());
                     } else {
-                        lengthWithNoise = (task_runtime * (1 - normalDistribution.sample() * 0.15));
+                        lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
                     }
 
                     costsVm.put(vm,

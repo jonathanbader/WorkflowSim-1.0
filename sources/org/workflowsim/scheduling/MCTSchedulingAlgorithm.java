@@ -15,10 +15,16 @@
  */
 package org.workflowsim.scheduling;
 
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.Log;
-import org.workflowsim.CondorVM;
-import org.workflowsim.WorkflowSimTags;
+import com.jayway.jsonpath.JsonPath;
+import org.workflowsim.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * MCT algorithm
@@ -29,14 +35,26 @@ import org.workflowsim.WorkflowSimTags;
  */
 public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
+    List<LinkedHashMap<String, Object>> arr;
+
+    Random random;
+
     public MCTSchedulingAlgorithm() {
         super();
+
+        try {
+            java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+            arr = JsonPath.read(f, "$");
+            random = new Random();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
 
-
+        /*
         int size = getCloudletList().size();
 
         for (int i = 0; i < size; i++) {
@@ -57,11 +75,14 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
             for (int j = 0; j < vmSize; j++) {
                 CondorVM vm = (CondorVM) getVmList().get(j);
+
                 if ((vm.getState() == WorkflowSimTags.VM_STATUS_IDLE)
                         && (vm.getCurrentRequestedTotalMips() > firstIdleVm.getCurrentRequestedTotalMips())) {
                     firstIdleVm = vm;
                 }
             }
+
+
             firstIdleVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
             cloudlet.setVmId(firstIdleVm.getId());
             getScheduledList().add(cloudlet);
@@ -69,5 +90,93 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     + cloudlet.getCloudletLength() + " to VM " + firstIdleVm.getId()
                     + " with " + firstIdleVm.getCurrentRequestedTotalMips());
         }
+         */
+
+        mct();
+    }
+
+    public void mct() {
+
+        if (getCloudletList().size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < getCloudletList().size(); i++) {
+
+            List<CondorVM> vmList = getVmList();
+
+            Job job = (Job) getCloudletList().get(i);
+
+            // irgendwo Error hier
+            if (job.getTaskList().size() == 0) {
+                CondorVM minVm = (CondorVM) getVmList().get((int) Math.round(random.nextDouble() * (getVmList().size() - 1)));
+                Task minTask = ((List<Job>)getCloudletList()).get(i);
+                Task finalMinTask = minTask;
+                Job minJob = ((List<Job>)getCloudletList()).stream().filter(c -> c.getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+                minJob.setVmId(minVm.getId());
+                minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+                getScheduledList().add(minJob);
+                return;
+            }
+
+            Task task = job.getTaskList().get(0);
+
+            Task minTask = null;
+
+            CondorVM minVm = null;
+
+            long minTime = Long.MAX_VALUE;
+
+            List<CondorVM> freeVMs = new ArrayList<>();
+            for (int l = 0; l < vmList.size(); l++) {
+                CondorVM vm = vmList.get(l);
+                if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
+                    freeVMs.add(vm);
+                }
+            }
+
+            if (freeVMs.size() == 0) {
+                return;
+            }
+
+            for (int j = 0; j < freeVMs.size(); j++) {
+                CondorVM vm = freeVMs.get(j);
+
+                AtomicInteger runtimeSum = new AtomicInteger();
+                AtomicInteger count = new AtomicInteger();
+                this.arr.forEach(entry -> {
+
+                    if (task.getType().contains(((String) entry.get("taskName"))) &&
+                            vm.getName().equals((String) entry.get("instanceType")) &&
+                            ((String) entry.get("wfName")).contains(task.getWorkflow())) {
+                        runtimeSum.addAndGet((Integer) entry.get("realtime"));
+                        count.getAndIncrement();
+                    }
+                });
+
+
+                long lengthWithNoise;
+
+                if (count.get() != 0) {
+                    lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * MetaGetter.getRandomFactor());
+                } else {
+                    lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
+                }
+
+                if (minTime > lengthWithNoise) {
+                    minTask = task;
+                    minVm = vm;
+                    minTime = lengthWithNoise;
+                }
+
+            }
+
+            Task finalMinTask = minTask;
+            Job minJob = ((List<Job>)getCloudletList()).stream().filter(c -> c.getTaskList().get(0).getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+            minJob.setVmId(minVm.getId());
+            minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
+            getScheduledList().add(minJob);
+        }
+
     }
 }

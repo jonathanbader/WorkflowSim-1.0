@@ -15,6 +15,8 @@
  */
 package org.workflowsim.scheduling;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,11 +24,10 @@ import java.util.stream.Collectors;
 
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.cloudbus.cloudsim.Cloudlet;
-import org.workflowsim.CondorVM;
-import org.workflowsim.Job;
-import org.workflowsim.Task;
-import org.workflowsim.WorkflowSimTags;
+import org.workflowsim.*;
 
 /**
  * MinMin algorithm.
@@ -39,14 +40,15 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
     List<LinkedHashMap<String, Object>> arr;
 
-    NormalDistribution normalDistribution = new NormalDistribution(1, 0.5);
-    Random random = new Random();
+    NormalDistribution normalDistribution;
+    Random random;
 
     public MinMinSchedulingAlgorithm() {
         super();
         try {
             java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
             arr = JsonPath.read(f, "$");
+            random = new Random();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -161,7 +163,7 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                 }
 
                 if (freeVMs.size() == 0) {
-                    break;
+                    return;
                 }
 
                 if (jobWrapper.getTaskList().size() == 0) {
@@ -190,10 +192,10 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                         long lengthWithNoise;
 
-                        if (random.nextDouble() > 0.5) {
-                            lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 + normalDistribution.sample() * 0.15));
+                        if (count.get() != 0) {
+                            lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * MetaGetter.getRandomFactor());
                         } else {
-                            lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 - normalDistribution.sample() * 0.15));
+                            lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
                         }
 
                         if (minTime > lengthWithNoise) {
@@ -269,6 +271,10 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     }
                 }
 
+                if (freeVMs.size() == 0) {
+                    return;
+                }
+
                 for (CondorVM vm : freeVMs) {
 
                     AtomicInteger runtimeSum = new AtomicInteger();
@@ -285,12 +291,10 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                     long lengthWithNoise;
 
-                    if (random.nextDouble() > 0.5 && count.get() != 0) {
-                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 + normalDistribution.sample() * 0.15));
-                    } else if (count.get() != 0){
-                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 - normalDistribution.sample() * 0.15));
+                    if (count.get() != 0) {
+                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * MetaGetter.getRandomFactor());
                     } else {
-                        lengthWithNoise = (long) (task.getCloudletLength() * (1 - normalDistribution.sample() * 0.15));
+                        lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
                     }
 
                     if (minTime > lengthWithNoise) {

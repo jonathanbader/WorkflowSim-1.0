@@ -44,12 +44,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.workflowsim.CondorVM;
-import org.workflowsim.Task;
-import org.workflowsim.WorkflowDatacenter;
-import org.workflowsim.Job;
-import org.workflowsim.WorkflowEngine;
-import org.workflowsim.WorkflowPlanner;
+import org.workflowsim.*;
 import org.workflowsim.utils.ClusteringParameters;
 import org.workflowsim.utils.OverheadParameters;
 import org.workflowsim.utils.Parameters;
@@ -145,6 +140,7 @@ public class WorkflowSimBasicExample1 {
         int numberIterations = 100;
         int clusterSize = 100;
 
+
         if (args.length == 2) {
             numberIterations = Integer.parseInt(args[0]);
             clusterSize = Integer.parseInt(args[1]);
@@ -153,7 +149,22 @@ public class WorkflowSimBasicExample1 {
         java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
         List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
 
-        ExecutorService executorService = Executors.newFixedThreadPool(7);
+        ExecutorService executorService = Executors.newFixedThreadPool(6);
+
+
+        prepareSimulations(arr, 100, 5);
+        prepareSimulations(arr, 100, 10);
+        prepareSimulations(arr, 100, 15);
+        prepareSimulations(arr, 100, 20);
+        prepareSimulations(arr, 100, 25);
+        prepareSimulations(arr, 100, 30);
+
+
+    }
+
+    private static void prepareSimulations(List<LinkedHashMap<String, Object>> arr, int numberIterations, int clusterSize) throws IOException {
+
+        long randomSeed = System.currentTimeMillis();
 
         BufferedWriter resultsWriter = new BufferedWriter(new FileWriter("results_" + numberIterations + "_" + clusterSize + ".csv"));
         resultsWriter.write("NumberNodes,Seed,Scheduler,Runtime" + "\n");
@@ -161,19 +172,37 @@ public class WorkflowSimBasicExample1 {
         // Fehler bei random Cluster
         for (long i = 0; i < numberIterations; i++) {
 
+            //seed file anders nennen, damit bei parallelen Ausführugen nicht überschrieben, bzw. oben in Threads auslagern aber dann muss der Seed anders vergeben werden
+            BufferedWriter seedWriter = new BufferedWriter(new FileWriter("seed.txt"));
+            seedWriter.write(randomSeed + "");
+            seedWriter.flush();
+            seedWriter.close();
 
             runSimulation(i, Parameters.SchedulingAlgorithm.STATIC, arr, resultsWriter, clusterSize);
-            runSimulation(i, Parameters.SchedulingAlgorithm.RESHI, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHIV1, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHIV2, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHIV3, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHIMAX, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
+            runSimulation(i, Parameters.SchedulingAlgorithm.RESHIFCFS, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.MINMIN, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.MAXMIN, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.MCT, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.ROUNDROBIN, arr, resultsWriter, clusterSize);
+            MetaGetter.resetGenerator();
 
 
         }
         System.out.println("Runtime in millis:" + (System.currentTimeMillis() - millis_start));
         resultsWriter.close();
-
     }
 
     private static void runSimulation(Long seed, Parameters.SchedulingAlgorithm schedulingAlgorithm, List<LinkedHashMap<String, Object>> arr, BufferedWriter bufferedWriter, int totalNumberVms) {

@@ -15,6 +15,11 @@
  */
 package org.workflowsim.scheduling;
 
+import com.jayway.jsonpath.JsonPath;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.workflowsim.*;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,33 +27,33 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.apache.commons.math3.distribution.NormalDistribution;
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.Log;
-import org.workflowsim.CondorVM;
-import org.workflowsim.Job;
-import org.workflowsim.Task;
-import org.workflowsim.WorkflowSimTags;
-
 /**
  * MaxMin algorithm.
  *
  * @author Weiwei Chen
- * @since WorkflowSim Toolkit 1.0
  * @date Apr 9, 2013
+ * @since WorkflowSim Toolkit 1.0
  */
 public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
     List<LinkedHashMap<String, Object>> arr;
 
-    NormalDistribution normalDistribution = new NormalDistribution(1, 0.5);
-    Random random = new Random();
+    NormalDistribution normalDistribution;
+    Random random;
 
     /**
      * Initialize a MaxMin scheduler.
      */
     public MaxMinSchedulingAlgorithm() {
         super();
+        try {
+            java.io.File f = new java.io.File("/home/joba/IdeaProjects/WorkflowSim-1.0/config/runtimes/runtimes_pp.json");
+            arr = JsonPath.read(f, "$");
+            random = new Random();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -147,7 +152,7 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
             CondorVM minVm = null;
 
-            long minTime = Long.MAX_VALUE;
+            long minTime = Long.MIN_VALUE;
 
             if (cloudlets.get(i).getTaskList().size() == 0) {
                 minVm = vmList.get((int) Math.round(random.nextDouble() * (vmList.size() - 1)));
@@ -175,6 +180,10 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     }
                 }
 
+                if (freeVMs.size() == 0) {
+                    return;
+                }
+
                 for (CondorVM vm : freeVMs) {
 
                     AtomicInteger runtimeSum = new AtomicInteger();
@@ -191,15 +200,17 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                     long lengthWithNoise;
 
-                    if (random.nextDouble() > 0.5 && count.get() != 0) {
-                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 + normalDistribution.sample() * 0.15));
-                    } else if (count.get() != 0) {
-                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * (1 - normalDistribution.sample() * 0.15));
+                    if (count.get() != 0) {
+                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * MetaGetter.getRandomFactor());
                     } else {
-                        lengthWithNoise = (long) (task.getCloudletLength() * (1 - normalDistribution.sample() * 0.15));
+                        lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
                     }
 
-                    if (minTime < lengthWithNoise) {
+                    if (task.equals(minTask) && minTime > lengthWithNoise) {
+                        minTask = task;
+                        minVm = vm;
+                        minTime = lengthWithNoise;
+                    } else if (!task.equals(minTask) && minTime < lengthWithNoise) {
                         minTask = task;
                         minVm = vm;
                         minTime = lengthWithNoise;

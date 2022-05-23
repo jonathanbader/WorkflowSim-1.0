@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,6 +17,7 @@ package org.workflowsim;
 
 import java.util.HashMap;
 import java.util.List;
+
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.DatacenterBroker;
 import org.cloudbus.cloudsim.Log;
@@ -138,8 +139,20 @@ public class WorkflowScheduler extends DatacenterBroker {
             case FCFS:
                 algorithm = new FCFSSchedulingAlgorithm();
                 break;
-            case RESHI:
-                algorithm = new ReshiSchedulingAlgorithm();
+            case RESHIFCFS:
+                algorithm = new ReshiSchedulingAlgorithm(ReshiStrategy.FCFS);
+                break;
+            case RESHIV1:
+                algorithm = new ReshiSchedulingAlgorithm(ReshiStrategy.V1);
+                break;
+            case RESHIV2:
+                algorithm = new ReshiSchedulingAlgorithm(ReshiStrategy.V2);
+                break;
+            case RESHIV3:
+                algorithm = new ReshiSchedulingAlgorithm(ReshiStrategy.V3);
+                break;
+            case RESHIMAX:
+                algorithm = new ReshiSchedulingAlgorithm(ReshiStrategy.MAX);
                 break;
             case MINMIN:
                 algorithm = new MinMinSchedulingAlgorithm();
@@ -329,6 +342,7 @@ public class WorkflowScheduler extends DatacenterBroker {
     protected void submitCloudlets() {
         sendNow(this.workflowEngineId, CloudSimTags.CLOUDLET_SUBMIT, null);
     }
+
     /**
      * A trick here. Assure that we just submit it once
      */

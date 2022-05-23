@@ -177,9 +177,9 @@ public final class WorkflowParser {
                         length *= Parameters.getRuntimeScale();
                         long lengthWithNoise;
                     /**    if (random.nextDouble() > 0.5) {
-                            lengthWithNoise = (long) (length * (1 + normalDistribution.sample() * 0.15));
+                            lengthWithNoise = (long) (length * (1 + normalDistribution.sample() * 0.25));
                         } else {
-                            lengthWithNoise = (long) (length * (1 - normalDistribution.sample() * 0.15));
+                            lengthWithNoise = (long) (length * (1 - normalDistribution.sample() * 0.25));
                         }
                      **/
 
