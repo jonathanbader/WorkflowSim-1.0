@@ -45,6 +45,9 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
     private Map<Task, Double> earliestFinishTimes;
     private double averageBandwidth;
 
+    NormalDistribution normalDistribution = new NormalDistribution(1, 0.5);
+    Random random = new Random();
+
     private class Event {
 
         public double start;
@@ -143,7 +146,7 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
 
                     AtomicInteger runtimeSum = new AtomicInteger();
                     AtomicInteger count = new AtomicInteger();
-                    arr.stream().filter(e -> ((String)e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
+                    arr.stream().filter(e -> ((String) e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
 
                         if (task.getType().contains(((String) entry.get("taskName"))) &&
                                 vm.getName().equals((String) entry.get("instanceType")) &&
@@ -152,14 +155,15 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
                             count.getAndIncrement();
                         }
                     });
-
-
-                    double lengthWithNoise;
                     if (count.get() != 0) {
-                        lengthWithNoise = (long) ((runtimeSum.get() / count.get()) * MetaGetter.getRandomFactor());
+                        task_runtime = runtimeSum.get() / count.get();
+                        //task_runtime = task.getCloudletLength() / vm.getMips();
                     } else {
-                        lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
+                        task_runtime = task.getCloudletLength() / vm.getMips();
                     }
+
+                    double lengthWithNoise = (task_runtime * (MetaGetter.getRandomFactor()));
+
 
                     costsVm.put(vm,
                             lengthWithNoise);
@@ -330,10 +334,10 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
      * given task in the vm with the constraint of not scheduling it before
      * readyTime. If occupySlot is true, reserves the time slot in the schedule.
      *
-     * @param task The task to have the time slot reserved
-     * @param vm The vm that will execute the task
-     * @param readyTime The first moment that the task is available to be
-     * scheduled
+     * @param task       The task to have the time slot reserved
+     * @param vm         The vm that will execute the task
+     * @param readyTime  The first moment that the task is available to be
+     *                   scheduled
      * @param occupySlot If true, reserves the time slot in the schedule.
      * @return The minimal finish time of the task in the vmn
      */

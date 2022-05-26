@@ -19,6 +19,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.workflowsim.Job;
+import org.workflowsim.MetaGetter;
 import org.workflowsim.Task;
 
 /**
@@ -476,7 +477,7 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
 
         AtomicInteger runtimeSum = new AtomicInteger();
         AtomicInteger count = new AtomicInteger();
-        this.taskList.forEach(entry -> {
+        this.taskList.stream().filter(e -> ((String) e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
 
             if (task.getType().contains(((String) entry.get("taskName"))) &&
                     vm.getName().equals((String) entry.get("instanceType")) &&
