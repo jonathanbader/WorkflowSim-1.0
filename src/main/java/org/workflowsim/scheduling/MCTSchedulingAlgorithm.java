@@ -1,12 +1,12 @@
 /**
  * Copyright 2012-2013 University Of Southern California
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -42,13 +42,9 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
     public MCTSchedulingAlgorithm() {
         super();
 
-        try {
-            java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
-            arr = JsonPath.read(f, "$");
-            random = new Random();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        arr = MetaGetter.getArr();
+        random = new Random();
+
     }
 
     @Override
@@ -110,9 +106,9 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             // irgendwo Error hier
             if (job.getTaskList().size() == 0) {
                 CondorVM minVm = (CondorVM) getVmList().get((int) Math.round(random.nextDouble() * (getVmList().size() - 1)));
-                Task minTask = ((List<Job>)getCloudletList()).get(i);
+                Task minTask = ((List<Job>) getCloudletList()).get(i);
                 Task finalMinTask = minTask;
-                Job minJob = ((List<Job>)getCloudletList()).stream().filter(c -> c.getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+                Job minJob = ((List<Job>) getCloudletList()).stream().filter(c -> c.getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
                 minJob.setVmId(minVm.getId());
                 minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
                 getScheduledList().add(minJob);
@@ -144,7 +140,7 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                 AtomicInteger runtimeSum = new AtomicInteger();
                 AtomicInteger count = new AtomicInteger();
-                this.arr.stream().filter(e -> ((String)e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
+                this.arr.stream().filter(e -> ((String) e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
 
                     if (task.getType().contains(((String) entry.get("taskName"))) &&
                             vm.getName().equals((String) entry.get("instanceType")) &&
@@ -172,7 +168,7 @@ public class MCTSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             }
 
             Task finalMinTask = minTask;
-            Job minJob = ((List<Job>)getCloudletList()).stream().filter(c -> c.getTaskList().get(0).getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
+            Job minJob = ((List<Job>) getCloudletList()).stream().filter(c -> c.getTaskList().get(0).getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
             minJob.setVmId(minVm.getId());
             minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
             getScheduledList().add(minJob);

@@ -1,5 +1,6 @@
 package org.workflowsim;
 
+import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -9,10 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 public class MetaGetter {
 
@@ -33,6 +31,8 @@ public class MetaGetter {
     private static int listPointer = 0;
 
     private static int listPointeroffset = 0;
+
+    private static List<LinkedHashMap<String, Object>> arr;
 
     private static double getRandomFromNormalDist() {
 
@@ -93,6 +93,20 @@ public class MetaGetter {
             return -1;
         }
 
+    }
+
+    public static List<LinkedHashMap<String, Object>> getArr() {
+        if (arr == null) {
+
+            try {
+                java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
+                arr = JsonPath.read(f, "$");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return arr;
     }
 
 

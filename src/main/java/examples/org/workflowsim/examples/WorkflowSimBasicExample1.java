@@ -51,6 +51,8 @@ import org.workflowsim.utils.Parameters;
 import org.workflowsim.utils.ReplicaCatalog;
 import org.workflowsim.utils.Parameters.ClassType;
 
+import static org.workflowsim.MetaGetter.getArr;
+
 /**
  * This WorkflowSimExample creates a workflow planner, a workflow engine, and
  * one schedulers, one data centers and 20 vms. You should change daxPath at
@@ -173,17 +175,12 @@ public class WorkflowSimBasicExample1 {
             System.out.println("Start");
         }
 
-        java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
-        List<LinkedHashMap<String, Object>> arr = JsonPath.read(f, "$");
-
-        ExecutorService executorService = Executors.newFixedThreadPool(6);
-
-
-        //prepareSimulations(arr, 100, 4);
-        prepareSimulations(arr, 100, 8);
-        prepareSimulations(arr, 100, 12);
-        prepareSimulations(arr, 100, 16);
-        prepareSimulations(arr, 100, 20);
+        prepareSimulations(MetaGetter.getArr(), 100, 4);
+        prepareSimulations(MetaGetter.getArr(), 100, 8);
+        prepareSimulations(MetaGetter.getArr(), 100, 12);
+        prepareSimulations(MetaGetter.getArr(), 100, 16);
+        prepareSimulations(MetaGetter.getArr(), 100, 20);
+        prepareSimulations(MetaGetter.getArr(), 100, 24);
 
 
     }
@@ -206,18 +203,17 @@ public class WorkflowSimBasicExample1 {
             //seedWriter.flush();
             //seedWriter.close();
 
+
             runSimulation(i, Parameters.SchedulingAlgorithm.STATIC, arr, resultsWriter, clusterSize);
             MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.RESHIV1, arr, resultsWriter, clusterSize);
             MetaGetter.resetGenerator();
-            /*
             runSimulation(i, Parameters.SchedulingAlgorithm.RESHIV2, arr, resultsWriter, clusterSize);
             MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.RESHIV3, arr, resultsWriter, clusterSize);
             MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.RESHIMAX, arr, resultsWriter, clusterSize);
             MetaGetter.resetGenerator();
-            */
             runSimulation(i, Parameters.SchedulingAlgorithm.RESHIFCFS, arr, resultsWriter, clusterSize);
             MetaGetter.resetGenerator();
             runSimulation(i, Parameters.SchedulingAlgorithm.MINMIN, arr, resultsWriter, clusterSize);

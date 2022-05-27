@@ -51,9 +51,6 @@ public class WorkflowDatacenter extends Datacenter {
                               double schedulingInterval) throws Exception {
         super(name, characteristics, vmAllocationPolicy, storageList, schedulingInterval);
 
-        //java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
-        //arr = JsonPath.read(f, "$");
-
     }
 
     /**

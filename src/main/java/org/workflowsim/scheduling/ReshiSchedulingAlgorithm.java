@@ -33,7 +33,7 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         this.reshiStrategy = reshiStrategy;
         reshiTaskList = new ArrayList<>();
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/config/ranking/ranks_methylseq_Stochastic Gradient Descent_3.csv"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/config/ranking/ranks_methylseq_Decision Tree Regressor_1.csv"))) {
             String s = null;
             bufferedReader.readLine();
             while ((s = bufferedReader.readLine()) != null) {
@@ -77,8 +77,8 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             // V2
             Collections.sort(cloudlets, (j1, j2) -> {
 
-                int descandantsJ1 = j1.getChildList().size();
-                int descandantsJ2 = j2.getChildList().size();
+                int descandantsJ1 = totalDescendants(j1);
+                int descandantsJ2 = totalDescendants(j2);
 
                 if (descandantsJ1 < descandantsJ2) {
                     return 1;

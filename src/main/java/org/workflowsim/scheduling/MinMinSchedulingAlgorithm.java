@@ -45,13 +45,11 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
     public MinMinSchedulingAlgorithm() {
         super();
-        try {
-            java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
-            arr = JsonPath.read(f, "$");
-            random = new Random();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+
+        arr = MetaGetter.getArr();
+        random = new Random();
+
     }
 
     private final List<Boolean> hasChecked = new ArrayList<>();
@@ -276,7 +274,7 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                     AtomicInteger runtimeSum = new AtomicInteger();
                     AtomicInteger count = new AtomicInteger();
-                    this.arr.stream().filter(e -> ((String)e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
+                    this.arr.stream().filter(e -> ((String) e.get("wfName")).contains(MetaGetter.getWorkflow())).forEach(entry -> {
 
                         if (task.getType().contains(((String) entry.get("taskName"))) &&
                                 vm.getName().equals((String) entry.get("instanceType")) &&
@@ -302,7 +300,6 @@ public class MinMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                 }
             }
-            System.out.println("Assgined: " + minTask.getType() + "(" + minTask.getCloudletId() + ")");
             checked.add(minTask.getCloudletId());
             Task finalMinTask = minTask;
             Job minJob = cloudlets.stream().filter(c -> c.getTaskList().get(0).getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);

@@ -82,13 +82,8 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
         earliestFinishTimes = new HashMap<>();
         schedules = new HashMap<>();
 
+        arr = MetaGetter.getArr();
 
-        try {
-            java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
-            arr = JsonPath.read(f, "$");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -307,6 +302,9 @@ public class HEFTPlanningAlgorithm extends BasePlanningAlgorithm {
             double minReadyTime = 0.0;
 
             for (Task parent : task.getParentList()) {
+                if(earliestFinishTimes.get(parent) == null) {
+                    continue;
+                }
                 double readyTime = earliestFinishTimes.get(parent);
                 if (parent.getVmId() != vm.getId()) {
                     readyTime += transferCosts.get(parent).get(task);
