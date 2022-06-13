@@ -26,11 +26,6 @@
     <uses file="task_id_1_v_bismark_genome_preparation.txt" link="output" size="302"/>
     <uses file="task_id_1_v_pipeline.txt" link="output" size="6"/>
   </job>
-  <job id="3" name="output_documentation" namespace="methylseq" numcores="1" runtime="0.288" runtime_raw="0.288">
-    <uses file="null_output.md" link="input" size="10970"/>
-    <uses file="null_images" link="input" size="4096"/>
-    <uses file="task_id_3_results_description.html" link="output" size="15936"/>
-  </job>
   <job id="2" name="makeBismarkIndex (1)" namespace="methylseq" numcores="2" runtime="10.702" runtime_raw="5.351">
     <uses file="null_genome.fa" link="input" size="49200"/>
     <uses file="task_id_2_BS_CT.2.bt2" link="output" size="12132"/>
@@ -114,10 +109,6 @@
     <uses file="task_id_12_SRR389222_sub3_trimmed_bismark_bt2.bam" link="output" size="2041961"/>
     <uses file="task_id_12_SRR389222_sub3_trimmed_bismark_bt2_SE_report.txt" link="output" size="1831"/>
   </job>
-  <job id="13" name="preseq (SRR389222_sub1)" namespace="methylseq" numcores="1" runtime="2.362" runtime_raw="2.362">
-    <uses file="SRR389222_sub1_SRR389222_sub1_trimmed_bismark_bt2.bam" link="input" size="2542621"/>
-    <uses file="task_id_13_SRR389222_sub1_trimmed_bismark_bt2.sorted.bam" link="output" size="1739972"/>
-  </job>
   <job id="14" name="bismark_deduplicate (SRR389222_sub1)" namespace="methylseq" numcores="2" runtime="0.8" runtime_raw="0.4">
     <uses file="SRR389222_sub1_SRR389222_sub1_trimmed_bismark_bt2.bam" link="input" size="2542621"/>
     <uses file="task_id_14_SRR389222_sub1_trimmed_bismark_bt2.deduplicated.bam" link="output" size="18823"/>
@@ -189,10 +180,6 @@
     <uses file="task_id_17_SRR389222_sub3_trimmed_bismark_bt2.deduplicated.bam" link="output" size="19189"/>
     <uses file="task_id_17_SRR389222_sub3_trimmed_bismark_bt2.deduplication_report.txt" link="output" size="279"/>
   </job>
-  <job id="18" name="preseq (SRR389222_sub3)" namespace="methylseq" numcores="1" runtime="1.848" runtime_raw="1.848">
-    <uses file="SRR389222_sub3_SRR389222_sub3_trimmed_bismark_bt2.bam" link="input" size="2041961"/>
-    <uses file="task_id_18_SRR389222_sub3_trimmed_bismark_bt2.sorted.bam" link="output" size="1398502"/>
-  </job>
   <job id="20" name="bismark_methXtract (SRR389222_sub3)" namespace="methylseq" numcores="2" runtime="22.424" runtime_raw="11.212">
     <uses file="SRR389222_sub3_SRR389222_sub3_trimmed_bismark_bt2.deduplicated.bam" link="input" size="19189"/>
     <uses file="SRR389222_sub3_BismarkIndex" link="input" size="4096"/>
@@ -258,10 +245,6 @@
     <uses file="SRR389222_sub2_SRR389222_sub2_trimmed_bismark_bt2.bam" link="input" size="3048443"/>
     <uses file="task_id_22_SRR389222_sub2_trimmed_bismark_bt2.deduplicated.bam" link="output" size="19872"/>
     <uses file="task_id_22_SRR389222_sub2_trimmed_bismark_bt2.deduplication_report.txt" link="output" size="279"/>
-  </job>
-  <job id="21" name="preseq (SRR389222_sub2)" namespace="methylseq" numcores="1" runtime="1.859" runtime_raw="1.859">
-    <uses file="SRR389222_sub2_SRR389222_sub2_trimmed_bismark_bt2.bam" link="input" size="3048443"/>
-    <uses file="task_id_21_SRR389222_sub2_trimmed_bismark_bt2.sorted.bam" link="output" size="2085404"/>
   </job>
   <job id="23" name="qualimap (SRR389222_sub2)" namespace="methylseq" numcores="2" runtime="4.794" runtime_raw="2.397">
     <uses file="SRR389222_sub2_SRR389222_sub2_trimmed_bismark_bt2.deduplicated.bam" link="input" size="19872"/>
@@ -344,40 +327,6 @@
     <uses file="SRR389222_sub2_SRR389222_sub2_trimmed_bismark_bt2.deduplicated_splitting_report.txt" link="input" size="783"/>
     <uses file="SRR389222_sub2_SRR389222_sub2_trimmed_bismark_bt2.deduplicated.M-bias.txt" link="input" size="2020"/>
     <uses file="task_id_27_SRR389222_sub2_trimmed_bismark_bt2_SE_report.html" link="output" size="3151231"/>
-  </job>
-  <job id="28" name="bismark_summary" namespace="methylseq" numcores="1" runtime="0.222" runtime_raw="0.222">
-    <uses file="null_input.1" link="input" size="14"/>
-    <uses file="null_SRR389222_sub1_trimmed_bismark_bt2.bam" link="input" size="2542621"/>
-    <uses file="null_input.2" link="input" size="14"/>
-    <uses file="null_SRR389222_sub3_trimmed_bismark_bt2.bam" link="input" size="2041961"/>
-    <uses file="null_input.3" link="input" size="14"/>
-    <uses file="null_SRR389222_sub2_trimmed_bismark_bt2.bam" link="input" size="3048443"/>
-    <uses file="null_input.7" link="input" size="14"/>
-    <uses file="null_SRR389222_sub1_trimmed_bismark_bt2_SE_report.txt" link="input" size="1834"/>
-    <uses file="null_input.8" link="input" size="14"/>
-    <uses file="null_SRR389222_sub3_trimmed_bismark_bt2_SE_report.txt" link="input" size="1831"/>
-    <uses file="null_input.9" link="input" size="14"/>
-    <uses file="null_SRR389222_sub2_trimmed_bismark_bt2_SE_report.txt" link="input" size="1835"/>
-    <uses file="null_input.13" link="input" size="14"/>
-    <uses file="null_SRR389222_sub1_trimmed_bismark_bt2.deduplication_report.txt" link="input" size="279"/>
-    <uses file="null_input.14" link="input" size="14"/>
-    <uses file="null_SRR389222_sub3_trimmed_bismark_bt2.deduplication_report.txt" link="input" size="279"/>
-    <uses file="null_input.15" link="input" size="14"/>
-    <uses file="null_SRR389222_sub2_trimmed_bismark_bt2.deduplication_report.txt" link="input" size="279"/>
-    <uses file="null_input.19" link="input" size="14"/>
-    <uses file="null_SRR389222_sub1_trimmed_bismark_bt2.deduplicated_splitting_report.txt" link="input" size="782"/>
-    <uses file="null_input.20" link="input" size="14"/>
-    <uses file="null_SRR389222_sub3_trimmed_bismark_bt2.deduplicated_splitting_report.txt" link="input" size="782"/>
-    <uses file="null_input.21" link="input" size="14"/>
-    <uses file="null_SRR389222_sub2_trimmed_bismark_bt2.deduplicated_splitting_report.txt" link="input" size="783"/>
-    <uses file="null_input.25" link="input" size="14"/>
-    <uses file="null_SRR389222_sub1_trimmed_bismark_bt2.deduplicated.M-bias.txt" link="input" size="1994"/>
-    <uses file="null_input.26" link="input" size="14"/>
-    <uses file="null_SRR389222_sub3_trimmed_bismark_bt2.deduplicated.M-bias.txt" link="input" size="1994"/>
-    <uses file="null_input.27" link="input" size="14"/>
-    <uses file="null_SRR389222_sub2_trimmed_bismark_bt2.deduplicated.M-bias.txt" link="input" size="2020"/>
-    <uses file="task_id_28_bismark_summary_report.html" link="output" size="3151774"/>
-    <uses file="task_id_28_bismark_summary_report.txt" link="output" size="548"/>
   </job>
   <job id="29" name="multiqc (1)" namespace="methylseq" numcores="1" runtime="15.541" runtime_raw="15.541">
     <uses file="null_multiqc_config.yaml" link="input" size="606"/>

@@ -7,10 +7,10 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MetaGetter {
 
@@ -28,15 +28,17 @@ public class MetaGetter {
 
     private static ArrayList<Integer> seedStack = null;
 
+    private static int listPointeroffset = 0;
+
     private static int listPointer = 0;
 
-    private static int listPointeroffset = 0;
+    private static int randPointer = 0;
+
+    private static int randPointerOffset = 0;
 
     private static List<LinkedHashMap<String, Object>> arr;
 
     private static double getRandomFromNormalDist() {
-
-        random = new Random(seedStack.get(listPointer++));
 
         RandomGenerator rg = new JDKRandomGenerator();
         rg.setSeed(seedStack.get(listPointer++));
@@ -53,8 +55,6 @@ public class MetaGetter {
 
     private static double getRandomFromExponentialDist() {
 
-        random = new Random(seedStack.get(listPointer++));
-
         RandomGenerator rg = new JDKRandomGenerator();
         rg.setSeed(seedStack.get(listPointer++));
         exponentialDistribution = new ExponentialDistribution(rg, 1, 1);
@@ -68,9 +68,18 @@ public class MetaGetter {
         return factor;
     }
 
+    public static double getRandomForCluster() {
+
+        if (random == null) {
+            getRandomFactor();
+        }
+
+        return random.nextDouble();
+    }
+
     public static double getRandomFactor() {
 
-        BufferedReader bufferedReader = null;
+        BufferedReader bufferedReader;
 
         if (seedStack == null) {
             try {
@@ -84,6 +93,9 @@ public class MetaGetter {
                 throw new RuntimeException(e);
             }
         }
+
+        random = new Random(seedStack.get(randPointer));
+
 
         if (distribution.equals("exponential")) {
             return getRandomFromExponentialDist();
@@ -101,6 +113,7 @@ public class MetaGetter {
             try {
                 java.io.File f = new java.io.File("src/main/resources/config/runtimes/runtimes_pp.json");
                 arr = JsonPath.read(f, "$");
+                arr = arr.stream().filter(e -> ((String) e.get("wfName")).contains(MetaGetter.getWorkflow())).collect(Collectors.toList());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -111,7 +124,9 @@ public class MetaGetter {
 
 
     public static void resetGenerator() {
-        listPointer = 0 + listPointeroffset;
+        listPointer = listPointeroffset + 0;
+        randPointer = randPointerOffset + 0;
+        random = new Random(seedStack.get(randPointer));
 
     }
 
@@ -141,5 +156,9 @@ public class MetaGetter {
 
     public static void setListPointeroffset(int listPointeroffset) {
         MetaGetter.listPointeroffset = listPointeroffset;
+    }
+
+    public static void setRandPointerOffset(int randPointerOffset) {
+        MetaGetter.randPointerOffset = randPointerOffset;
     }
 }

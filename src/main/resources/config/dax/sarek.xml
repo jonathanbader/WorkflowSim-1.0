@@ -29,23 +29,6 @@
     <uses file="task_id_1_v_bwa.txt" link="output" size="38"/>
     <uses file="task_id_1_v_pipeline.txt" link="output" size="6"/>
   </job>
-  <job id="5" name="BuildDbsnpIndex (dbsnp_138.b37.small.vcf.gz)" namespace="sarek" numcores="2" runtime="0.068" runtime_raw="0.034">
-    <uses file="dbsnp_138.b37.small.vcf.gz_dbsnp_138.b37.small.vcf.gz" link="input" size="330394"/>
-    <uses file="task_id_5_dbsnp_138.b37.small.vcf.gz.tbi" link="output" size="591"/>
-  </job>
-  <job id="9" name="CreateIntervalBeds (small.intervals)" namespace="sarek" numcores="2" runtime="0.016" runtime_raw="0.008">
-    <uses file="small.intervals_small.intervals" link="input" size="63"/>
-    <uses file="task_id_9_8_1-1276.bed" link="output" size="9"/>
-    <uses file="task_id_9_X_1-200000.bed" link="output" size="11"/>
-    <uses file="task_id_9_3_1-200000.bed" link="output" size="11"/>
-    <uses file="task_id_9_2_1-200000.bed" link="output" size="11"/>
-    <uses file="task_id_9_1_1-200000.bed" link="output" size="11"/>
-    <uses file="task_id_9_11_1-3679.bed" link="output" size="10"/>
-  </job>
-  <job id="7" name="BuildKnownIndelsIndex (Mills_1000G_gold_standard_and_1000G_phase1.indels.b37.small.vcf.gz)" namespace="sarek" numcores="2" runtime="0.062" runtime_raw="0.031">
-    <uses file="Mills_1000G_gold_standard_and_1000G_phase1.indels.b37.small.vcf.gz_Mills_1000G_gold_standard_and_1000G_phase1.indels.b37.small.vcf.gz" link="input" size="12951"/>
-    <uses file="task_id_7_Mills_1000G_gold_standard_and_1000G_phase1.indels.b37.small.vcf.gz.tbi" link="output" size="458"/>
-  </job>
   <job id="10" name="FastQCFQ (1234-1234N_M1)" namespace="sarek" numcores="2" runtime="15.286" runtime_raw="7.643">
     <uses file="1234-1234N_M1_1234N_1234N_M1_R1.fastq.gz" link="input" size="5252"/>
     <uses file="1234-1234N_M1_1234N_1234N_M1_R2.fastq.gz" link="input" size="5197"/>
@@ -54,21 +37,9 @@
     <uses file="task_id_10_1234N_1234N_M1_R1_fastqc.zip" link="output" size="319692"/>
     <uses file="task_id_10_1234N_1234N_M1_R2_fastqc.html" link="output" size="288248"/>
   </job>
-  <job id="4" name="BuildFastaFai (human_g1k_v37_decoy.small.fasta)" namespace="sarek" numcores="2" runtime="0.05" runtime_raw="0.025">
-    <uses file="human_g1k_v37_decoy.small.fasta_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="task_id_4_human_g1k_v37_decoy.small.fasta.fai" link="output" size="125"/>
-  </job>
   <job id="3" name="BuildDict (human_g1k_v37_decoy.small.fasta)" namespace="sarek" numcores="2" runtime="10.566" runtime_raw="5.283">
     <uses file="human_g1k_v37_decoy.small.fasta_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
     <uses file="task_id_3_human_g1k_v37_decoy.small.dict" link="output" size="1058"/>
-  </job>
-  <job id="2" name="BuildBWAindexes (human_g1k_v37_decoy.small.fasta)" namespace="sarek" numcores="2" runtime="1.416" runtime_raw="0.708">
-    <uses file="human_g1k_v37_decoy.small.fasta_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="task_id_2_human_g1k_v37_decoy.small.fasta.bwt" link="output" size="805060"/>
-    <uses file="task_id_2_human_g1k_v37_decoy.small.fasta.amb" link="output" size="163"/>
-    <uses file="task_id_2_human_g1k_v37_decoy.small.fasta.pac" link="output" size="201246"/>
-    <uses file="task_id_2_human_g1k_v37_decoy.small.fasta.ann" link="output" size="334"/>
-    <uses file="task_id_2_human_g1k_v37_decoy.small.fasta.sa" link="output" size="402544"/>
   </job>
   <job id="11" name="FastQCFQ (1234-1234N_M2)" namespace="sarek" numcores="2" runtime="12.868" runtime_raw="6.434">
     <uses file="1234-1234N_M2_1234N_1234N_M2_R1.fastq.gz" link="input" size="2836"/>
@@ -77,11 +48,6 @@
     <uses file="task_id_11_1234N_1234N_M2_R1_fastqc.html" link="output" size="305478"/>
     <uses file="task_id_11_1234N_1234N_M2_R2_fastqc.html" link="output" size="304982"/>
     <uses file="task_id_11_1234N_1234N_M2_R2_fastqc.zip" link="output" size="334967"/>
-  </job>
-  <job id="12" name="Output_documentation" namespace="sarek" numcores="2" runtime="1.602" runtime_raw="0.801">
-    <uses file="null_output.md" link="input" size="34524"/>
-    <uses file="null_images" link="input" size="4096"/>
-    <uses file="task_id_12_results_description.html" link="output" size="49051"/>
   </job>
   <job id="13" name="FastQCFQ (1234-1234N_M4)" namespace="sarek" numcores="2" runtime="13.258" runtime_raw="6.629">
     <uses file="1234-1234N_M4_1234N_1234N_M4_R1.fastq.gz" link="input" size="6020"/>
@@ -154,138 +120,6 @@
     <uses file="task_id_21_9876T_9876T_M5_R1_fastqc.zip" link="output" size="322778"/>
     <uses file="task_id_21_9876T_9876T_M5_R1_fastqc.html" link="output" size="356576"/>
     <uses file="task_id_21_9876T_9876T_M5_R2_fastqc.html" link="output" size="356817"/>
-  </job>
-  <job id="34" name="MapReads (1234-9876T_M5)" namespace="sarek" numcores="2" runtime="0.266" runtime_raw="0.133">
-    <uses file="1234-9876T_M5_C09D_T_111207.8.ACCAACTG_R1_xxx.fastq.gz" link="input" size="53359"/>
-    <uses file="1234-9876T_M5_C09D_T_111207.8.ACCAACTG_R2_xxx.fastq.gz" link="input" size="55715"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-9876T_M5_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_34_9876T_9876T_M5.bam" link="output" size="136149"/>
-  </job>
-  <job id="26" name="MapReads (1234-1234N_M4)" namespace="sarek" numcores="2" runtime="0.102" runtime_raw="0.051">
-    <uses file="1234-1234N_M4_C09DF_N_111207.4.AGTTGCTT_R1_xxx.fastq.gz" link="input" size="6020"/>
-    <uses file="1234-1234N_M4_C09DF_N_111207.4.AGTTGCTT_R2_xxx.fastq.gz" link="input" size="6167"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-1234N_M4_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_26_1234N_1234N_M4.bam" link="output" size="14136"/>
-  </job>
-  <job id="32" name="MapReads (1234-9876T_M3)" namespace="sarek" numcores="2" runtime="0.226" runtime_raw="0.113">
-    <uses file="1234-9876T_M3_C09D_T_111207.6.ACCAACTG_R1_xxx.fastq.gz" link="input" size="49952"/>
-    <uses file="1234-9876T_M3_C09D_T_111207.6.ACCAACTG_R2_xxx.fastq.gz" link="input" size="52941"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-9876T_M3_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_32_9876T_9876T_M3.bam" link="output" size="127487"/>
-  </job>
-  <job id="33" name="MapReads (1234-9876T_M4)" namespace="sarek" numcores="2" runtime="0.262" runtime_raw="0.131">
-    <uses file="1234-9876T_M4_C09D_T_111207.7.ACCAACTG_R1_xxx.fastq.gz" link="input" size="55864"/>
-    <uses file="1234-9876T_M4_C09D_T_111207.7.ACCAACTG_R2_xxx.fastq.gz" link="input" size="57720"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-9876T_M4_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_33_9876T_9876T_M4.bam" link="output" size="140776"/>
-  </job>
-  <job id="31" name="MapReads (1234-9876T_M2)" namespace="sarek" numcores="2" runtime="0.164" runtime_raw="0.082">
-    <uses file="1234-9876T_M2_C09D_T_111207.5.ACCAACTG_R1_xxx.fastq.gz" link="input" size="49298"/>
-    <uses file="1234-9876T_M2_C09D_T_111207.5.ACCAACTG_R2_xxx.fastq.gz" link="input" size="51083"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-9876T_M2_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_31_9876T_9876T_M2.bam" link="output" size="124172"/>
-  </job>
-  <job id="29" name="MapReads (1234-1234N_M7)" namespace="sarek" numcores="2" runtime="0.086" runtime_raw="0.043">
-    <uses file="1234-1234N_M7_D0F23_N_111212.3.AGTTGCTT_R1_xxx.fastq.gz" link="input" size="6717"/>
-    <uses file="1234-1234N_M7_D0F23_N_111212.3.AGTTGCTT_R2_xxx.fastq.gz" link="input" size="6631"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-1234N_M7_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_29_1234N_1234N_M7.bam" link="output" size="15276"/>
-  </job>
-  <job id="25" name="MapReads (1234-1234N_M2)" namespace="sarek" numcores="2" runtime="0.06" runtime_raw="0.03">
-    <uses file="1234-1234N_M2_C097F_N_111207.2.AGTTGCTT_R1_xxx.fastq.gz" link="input" size="2836"/>
-    <uses file="1234-1234N_M2_C097F_N_111207.2.AGTTGCTT_R2_xxx.fastq.gz" link="input" size="2812"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-1234N_M2_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_25_1234N_1234N_M2.bam" link="output" size="6626"/>
-  </job>
-  <job id="24" name="MapReads (1234-1234N_M1)" namespace="sarek" numcores="2" runtime="0.07" runtime_raw="0.035">
-    <uses file="1234-1234N_M1_C097F_N_111207.1.AGTTGCTT_R1_xxx.fastq.gz" link="input" size="5252"/>
-    <uses file="1234-1234N_M1_C097F_N_111207.1.AGTTGCTT_R2_xxx.fastq.gz" link="input" size="5197"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-1234N_M1_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_24_1234N_1234N_M1.bam" link="output" size="12166"/>
-  </job>
-  <job id="30" name="MapReads (1234-9876T_M1)" namespace="sarek" numcores="2" runtime="0.194" runtime_raw="0.097">
-    <uses file="1234-9876T_M1_C09D_T_111207.3.ACCAACTG_R1_xxx.fastq.gz" link="input" size="52885"/>
-    <uses file="1234-9876T_M1_C09D_T_111207.3.ACCAACTG_R2_xxx.fastq.gz" link="input" size="55065"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-9876T_M1_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_30_9876T_9876T_M1.bam" link="output" size="133952"/>
-  </job>
-  <job id="28" name="MapReads (1234-1234N_M6)" namespace="sarek" numcores="2" runtime="0.1" runtime_raw="0.05">
-    <uses file="1234-1234N_M6_D0F23_N_111212.2.AGTTGCTT_R1_xxx.fastq.gz" link="input" size="7422"/>
-    <uses file="1234-1234N_M6_D0F23_N_111212.2.AGTTGCTT_R2_xxx.fastq.gz" link="input" size="7588"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-1234N_M6_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_28_1234N_1234N_M6.bam" link="output" size="16751"/>
-  </job>
-  <job id="27" name="MapReads (1234-1234N_M5)" namespace="sarek" numcores="2" runtime="0.086" runtime_raw="0.043">
-    <uses file="1234-1234N_M5_D0F23_N_111212.1.AGTTGCTT_R1_xxx.fastq.gz" link="input" size="8054"/>
-    <uses file="1234-1234N_M5_D0F23_N_111212.1.AGTTGCTT_R2_xxx.fastq.gz" link="input" size="8316"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta.amb" link="input" size="163"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta.ann" link="input" size="334"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta.bwt" link="input" size="805060"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta.pac" link="input" size="201246"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta.sa" link="input" size="402544"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta" link="input" size="818613"/>
-    <uses file="1234-1234N_M5_human_g1k_v37_decoy.small.fasta.fai" link="input" size="125"/>
-    <uses file="task_id_27_1234N_1234N_M5.bam" link="output" size="18489"/>
   </job>
   <job id="35" name="BamQC (1234-1234N_1234N_M4)" namespace="sarek" numcores="2" runtime="9.48" runtime_raw="4.74">
     <uses file="1234-1234N_1234N_M4_1234N_1234N_M4.bam" link="input" size="14136"/>
@@ -1265,10 +1099,6 @@
     <uses file="task_id_81_9876T.recal.bam.bai" link="output" size="208"/>
     <uses file="task_id_81_9876T.recal.bam" link="output" size="445142"/>
   </job>
-  <job id="85" name="SamtoolsStats (1234-1234N)" namespace="sarek" numcores="2" runtime="0.028" runtime_raw="0.014">
-    <uses file="1234-1234N_1234N.recal.bam" link="input" size="36099"/>
-    <uses file="task_id_85_1234N.recal.bam.samtools.stats.out" link="output" size="40485"/>
-  </job>
   <job id="82" name="BamQC (1234-1234N)" namespace="sarek" numcores="2" runtime="8.722" runtime_raw="4.361">
     <uses file="1234-1234N_1234N.recal.bam" link="input" size="36099"/>
     <uses file="1234-1234N_input.2" link="input" size="4"/>
@@ -1322,10 +1152,6 @@
     <uses file="task_id_82_genome_mapping_quality_across_reference.png" link="output" size="35966"/>
     <uses file="task_id_82_genome_coverage_quotes.png" link="output" size="26128"/>
     <uses file="task_id_82_genome_homopolymer_indels.png" link="output" size="17276"/>
-  </job>
-  <job id="109" name="SamtoolsStats (1234-9876T)" namespace="sarek" numcores="2" runtime="0.08" runtime_raw="0.04">
-    <uses file="1234-9876T_9876T.recal.bam" link="input" size="445142"/>
-    <uses file="task_id_109_9876T.recal.bam.samtools.stats.out" link="output" size="80860"/>
   </job>
   <job id="122" name="BamQC (1234-9876T)" namespace="sarek" numcores="2" runtime="9.01" runtime_raw="4.505">
     <uses file="1234-9876T_9876T.recal.bam" link="input" size="445142"/>

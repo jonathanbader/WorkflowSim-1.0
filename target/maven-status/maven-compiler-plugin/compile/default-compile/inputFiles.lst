@@ -112,6 +112,7 @@
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/workflowsim/scheduling/BaseSchedulingAlgorithm.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/workflowsim/scheduling/DataAwareSchedulingAlgorithm.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/workflowsim/WorkflowDatacenter.java
+/home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/examples/org/workflowsim/examples/TestNodes.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/examples/org/cloudbus/cloudsim/examples/network/NetworkExample2.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/workflowsim/failure/FailureRecord.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/examples/org/cloudbus/cloudsim/examples/power/planetlab/LrrRs.java
@@ -275,6 +276,7 @@
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/cloudbus/cloudsim/network/GraphReaderBrite.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/examples/org/workflowsim/examples/cost/WorkflowSimCostExample1.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/examples/org/cloudbus/cloudsim/examples/power/planetlab/IqrMu.java
+/home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/workflowsim/planning/HEFTPlanningAlgorithmReshi.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/cloudbus/cloudsim/core/predicates/PredicateNotFrom.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/examples/org/cloudbus/cloudsim/examples/power/Constants.java
 /home/joba/IdeaProjects/WorkflowSim-1.0/src/main/java/org/cloudbus/cloudsim/UtilizationModel.java

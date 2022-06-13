@@ -198,6 +198,10 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                         lengthWithNoise = (long) (task.getCloudletLength() * MetaGetter.getRandomFactor());
                     }
 
+                    if(task.getType().contains("PLOTPROFILE")) {
+                        System.out.println("Test");
+                    }
+
                     if (task.equals(minTask) && minTime > lengthWithNoise) {
                         minTask = task;
                         minVm = vm;
@@ -210,6 +214,8 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
                 }
             }
+
+
             checked.add(minTask.getCloudletId());
             Task finalMinTask = minTask;
             Job minJob = cloudlets.stream().filter(c -> c.getTaskList().get(0).getCloudletId() == finalMinTask.getCloudletId()).collect(Collectors.toList()).get(0);
@@ -217,5 +223,6 @@ public class MaxMinSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             minVm.setState(WorkflowSimTags.VM_STATUS_BUSY);
             getScheduledList().add(minJob);
         }
+
     }
 }

@@ -11,6 +11,7 @@ org/cloudbus/cloudsim/network/datacenter/NetDatacenterBroker.class
 org/cloudbus/cloudsim/CloudletSchedulerTimeShared.class
 examples/org/workflowsim/examples/failure/clustering/FaultTolerantClusteringExample7.class
 org/cloudbus/cloudsim/CloudletSchedulerDynamicWorkload.class
+org/workflowsim/planning/HEFTPlanningAlgorithmReshi.class
 org/cloudbus/cloudsim/examples/network/NetworkExample3.class
 org/workflowsim/planning/DHEFTPlanningAlgorithm.class
 org/cloudbus/cloudsim/power/models/PowerModelSpecPowerHpProLiantMl110G3PentiumD930.class
@@ -194,6 +195,7 @@ org/cloudbus/cloudsim/examples/network/datacenter/TestBagofTaskApp.class
 examples/org/workflowsim/examples/clustering/HorizontalClusteringExample3.class
 org/cloudbus/cloudsim/distributions/ParetoDistr.class
 org/cloudbus/cloudsim/power/PowerHost.class
+examples/org/workflowsim/examples/TestNodes.class
 org/cloudbus/cloudsim/power/models/PowerModelCubic.class
 org/cloudbus/cloudsim/examples/power/planetlab/LrMc.class
 org/workflowsim/scheduling/ReshiStrategy.class
@@ -249,6 +251,7 @@ org/cloudbus/cloudsim/network/datacenter/NetworkVm.class
 org/cloudbus/cloudsim/Host.class
 org/cloudbus/cloudsim/core/CloudSim.class
 examples/org/workflowsim/examples/clustering/HorizontalClusteringExample2.class
+org/workflowsim/planning/HEFTPlanningAlgorithmReshi$TaskRank.class
 org/cloudbus/cloudsim/Pe.class
 org/workflowsim/utils/Parameters$ClassType.class
 org/cloudbus/cloudsim/power/models/PowerModelSpecPowerIbmX3250XeonX3470.class
@@ -267,6 +270,7 @@ org/cloudbus/cloudsim/VmAllocationPolicy.class
 org/cloudbus/cloudsim/power/PowerDatacenterBroker.class
 org/cloudbus/cloudsim/examples/CloudSimExample7.class
 examples/org/workflowsim/examples/scheduling/MINMINSchedulingAlgorithmExample.class
+org/workflowsim/planning/HEFTPlanningAlgorithmReshi$Event.class
 org/cloudbus/cloudsim/examples/power/planetlab/LrrRs.class
 org/cloudbus/cloudsim/CloudletSchedulerSpaceShared.class
 org/cloudbus/cloudsim/examples/power/planetlab/IqrMmt.class

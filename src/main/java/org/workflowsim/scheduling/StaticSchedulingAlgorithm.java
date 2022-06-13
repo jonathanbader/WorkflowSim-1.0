@@ -20,6 +20,8 @@ import java.util.Map;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Log;
 import org.workflowsim.CondorVM;
+import org.workflowsim.Job;
+import org.workflowsim.Task;
 import org.workflowsim.WorkflowSimTags;
 
 /**
@@ -69,8 +71,12 @@ public class StaticSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             if (vm.getState() == WorkflowSimTags.VM_STATUS_IDLE) {
                 vm.setState(WorkflowSimTags.VM_STATUS_BUSY);
                 getScheduledList().add(cloudlet);
-                Log.printLine("Schedules " + cloudlet.getCloudletId() + " with "
-                        + cloudlet.getCloudletLength() + " to VM " + cloudlet.getVmId());
+
+                if(((Job) cloudlet).getTaskList().size() != 0) {
+                    Log.printLine("Schedules " + ((Job) cloudlet).getTaskList().get(0).getType() + " with "
+                            + cloudlet.getCloudletLength() + " to VM " + vm.getName() + "(" + vm.getId() + ")");
+                }
+
             }
         }
     }

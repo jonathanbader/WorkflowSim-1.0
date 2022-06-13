@@ -3,10 +3,7 @@ package org.workflowsim.scheduling;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.workflowsim.CondorVM;
-import org.workflowsim.Job;
-import org.workflowsim.Task;
-import org.workflowsim.WorkflowSimTags;
+import org.workflowsim.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -33,7 +30,7 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
         this.reshiStrategy = reshiStrategy;
         reshiTaskList = new ArrayList<>();
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/config/ranking/ranks_methylseq_Decision Tree Regressor_1.csv"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/config/ranking/ranks_"+ MetaGetter.getWorkflow() +"_Decision Tree Regressor_1.csv"))) {
             String s = null;
             bufferedReader.readLine();
             while ((s = bufferedReader.readLine()) != null) {
@@ -103,6 +100,21 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
                     return 0;
                 }
             });
+        } else if (reshiStrategy == ReshiStrategy.MAX) {
+            Collections.sort(cloudlets, (j1, j2) -> {
+
+                long length1 = j1.getCloudletLength();
+                long length2 = j2.getCloudletLength();
+
+                if (length1 < length2) {
+                    return 1;
+                } else if (length1 > length2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+
         }
 
         for (Job task : cloudlets) {
@@ -127,10 +139,10 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             if (vmToAssign == null) {
                 break;
             }
+            // Problem, dass irgendwie zu wenig Maschinen frei sind
             vmToAssign.setState(WorkflowSimTags.VM_STATUS_BUSY);
             task.setVmId(vmToAssign.getId());
             getScheduledList().add(task);
-
 
         }
 
@@ -147,18 +159,22 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
             return filteredList.get(0);
         }
         // Ranking nach dem Task filtern und sortieren
-        List<ReshiTask> filteredList = reshiTaskList.stream().filter(t -> t.taskName.equals(taskToLookup.getTaskList().get(0).getType()))
+        List<ReshiTask> filteredList = reshiTaskList.stream().filter(t -> (taskToLookup.getTaskList().get(0).getType().contains(t.taskName)) || (t.taskName.contains(taskToLookup.getTaskList().get(0).getType())))
                 .filter(t -> freeVMs.stream().map(vm -> vm.getName()).collect(Collectors.toList()).contains(t.node))
                 .collect(Collectors.toList());
 
-        // falls der Task nicht gerankt wurde
+        // falls der Task nicht gerankt wurde sollte lieber die schnellste node genommen werden
         if (filteredList.size() == 0) {
+
+            System.out.println("No ranking for:" + taskToLookup.getTaskList().get(0).getType());
+
             List<ReshiTask> list = reshiTaskList.stream().filter(t -> freeVMs.stream().map(vm -> vm.getName()).collect(Collectors.toList()).contains(t.node))
                     .collect(Collectors.toList());
             // Collections.shuffle(list);
             return list.get(0);
         }
 
+        System.out.println("ranking found for:" + taskToLookup.getTaskList().get(0).getType());
 
         Collections.sort(filteredList);
         return filteredList.get(0);
@@ -181,9 +197,9 @@ public class ReshiSchedulingAlgorithm extends BaseSchedulingAlgorithm {
 
         @Override
         public int compareTo(Object o) {
-            if (this.rank < ((ReshiTask) o).rank) {
+            if (this.rank > ((ReshiTask) o).rank) {
                 return 1;
-            } else if (this.rank > ((ReshiTask) o).rank) {
+            } else if (this.rank < ((ReshiTask) o).rank) {
                 return -1;
             } else {
                 return 0;
