@@ -72,22 +72,6 @@
             <version>2.0.6.1</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-rng-core -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-rng-simple</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-rng-sampling</artifactId>
-            <version>1.4</version>
-        </dependency>
-
-
-
-
     </dependencies>
-
 
 </project>
