@@ -497,8 +497,9 @@ public class CloudletSchedulerSpaceShared extends CloudletScheduler {
 
         // use the current capacity to estimate the extra amount of
         // time to file transferring. It must be added to the cloudlet length
+        // scale the runtime linear up since we assume profiling
         double extraSize = capacity * fileTransferTime;
-        double length = task_runtime;
+        double length = task_runtime * 1000 / 3600 ;
         length += extraSize;
 
         cloudlet.setCloudletLength((long) length);
